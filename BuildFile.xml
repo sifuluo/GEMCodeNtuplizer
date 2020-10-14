@@ -1,0 +1,75 @@
+<use name="root"/>
+<use name="boost"/>
+<use name="FWCore/Framework"/>
+<use name="FWCore/MessageLogger"/>
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/PluginManager"/>
+<use name="FWCore/Utilities"/>
+<use name="DataFormats/MuonDetId"/>
+<use name="DataFormats/GEMDigi"/>
+<use name="DataFormats/CSCDigi"/>
+<use name="DataFormats/RPCDigi"/>
+<use name="DataFormats/Math"/>
+<use name="Geometry/CommonDetUnit"/>
+<use name="Geometry/Records"/>
+<use name="Geometry/RPCGeometry"/>
+<use name="Geometry/CSCGeometry"/>
+<use name="Geometry/GEMGeometry"/>
+<use name="SimDataFormats/CrossingFrame"/>
+<use name="SimDataFormats/TrackerDigiSimLink"/>
+<use name="SimDataFormats/TrackingHit"/>
+<use name="SimGeneral/HepPDTRecord"/>
+<use name="CommonTools/UtilAlgos"/>
+<use name="Utilities/General"/>
+<use name="GEMCode/GEMValidation"/>
+<use name="Validation/MuonCSCDigis"/>
+<use name="Validation/MuonGEMDigis"/>
+
+<use name="Validation/MuonGEMRecHits"/>
+<use name="Validation/MuonHits"/>
+<use name="L1Trigger/L1TMuon"/>
+<use name="L1Trigger/CSCTriggerPrimitives"/>
+<use name="Geometry/TrackerGeometryBuilder"/>
+<use name="Geometry/TrackerNumberingBuilder"/>
+<use name="SimDataFormats/Vertex"/>
+
+
+<library name="GEMCodeGEMValidation_test" file="*.cc">
+  <flags EDM_PLUGIN="1" />
+</library>
+
+  <!-- <library   file="*.cc" name="TrackFindingTrackletTests">
+    <flags   EDM_PLUGIN="1"/>
+    <flags   SKIP_FILES="fpga.cc"/>
+
+
+
+    <use   name="CondFormats/Alignment"/>
+    <use   name="DataFormats/L1TrackTrigger"/>
+    <use   name="root"/>
+    <use   name="heppdt"/>
+    <use   name="SimTracker/TrackerHitAssociation"/>
+    <use   name="SimTracker/TrackTriggerAssociation"/>
+    <use   name="DataFormats/Common"/>
+    <use   name="DataFormats/TrackerRecHit2D"/>
+
+    <use   name="SimDataFormats/TrackingHit"/>
+    <use   name="SimDataFormats/CrossingFrame"/>
+    <use   name="SimDataFormats/TrackingAnalysis"/>
+    <use   name="RecoLocalTracker/SiPixelRecHits"/>
+    <use   name="PhysicsTools/UtilAlgos"/>
+    <use   name="FWCore/ServiceRegistry"/>
+    <use   name="clhep"/>
+    <use   name="TrackingTools/TrackAssociator"/>
+    <use   name="TrackingTools/TrajectoryState"/>
+    <use   name="PhysicsTools/CandUtils"/>
+    <use   name="FWCore/MessageLogger"/>
+    <use   name="DataFormats/L1Trigger"/>
+    <use   name="DataFormats/HepMCCandidate"/>
+    <use   name="CondFormats/L1TObjects"/>
+    <use   name="CondFormats/DataRecord"/>
+    <use   name="RecoTracker/TkSeedGenerator"/>
+    <use   name="CommonTools/UtilAlgos"/>
+    <use   name="DataFormats/Phase2TrackerDigi"/>
+    <flags   CXXFLAGS="-g -O0"/>
+  </library> -->

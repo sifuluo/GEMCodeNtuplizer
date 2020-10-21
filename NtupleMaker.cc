@@ -114,6 +114,7 @@ public:
   virtual void PrintHits(int iset, int idigi = -1);
   virtual int SaveHitMatrix(std::vector< std::vector<unsigned short> > hits, std::vector<int>* b_hit, std::vector<int>* b_pos, bool doprint = false, bool isclct = false);
   virtual std::vector<int> IntsToBinary(int n);
+  virtual GlobalPoint getGlobalPointDigi(unsigned int rawId, const GEMDigi& d);
 
 protected:
 
@@ -251,6 +252,8 @@ private:
   std::vector<float>* m_allGemDigi_eta;
   std::vector<float>* m_allGemDigi_z;
   std::vector<float>* m_allGemDigi_r;
+  std::vector<int>*   m_allGemDigi_detId;
+  std::vector<int>*   m_allGemDigi_strip;
 
   std::vector<float>* m_matchCscStubsLCT_phi;
   std::vector<float>* m_matchCscStubsLCT_eta;
@@ -282,11 +285,16 @@ private:
   std::vector<float>* m_matchGemDigi_eta;
   std::vector<float>* m_matchGemDigi_z;
   std::vector<float>* m_matchGemDigi_r;
+  std::vector<int>*   m_matchGemDigi_detId;
+  std::vector<int>*   m_matchGemDigi_strip;
   std::vector<int>*   m_matchGemDigi_matchTp;
 
   std::unique_ptr<MatcherManager> match;
 
   const TrackingGeometry* geometry_;
+
+  edm::ESGetToken<GEMGeometry, MuonGeometryRecord> geomToken_;
+  const GEMGeometry* gemGeometry_;
 };
 
 
@@ -308,8 +316,10 @@ config(iConfig)
   TrackingParticleToken_ = consumes< std::vector< TrackingParticle > >(TrackingParticleInputTag);
 
   m_emtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simEmtfDigis","EMTF"));
-  m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("gmtStage2Digis","BMTF"));
-  m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("gmtStage2Digis","OMTF"));
+  // m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("gmtStage2Digis","BMTF"));
+  // m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("gmtStage2Digis","OMTF"));
+  m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simBmtfDigis","BMTF"));
+  m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simOmtfDigis","OMTF"));
 
   const auto& simVertex = iConfig.getParameter<edm::ParameterSet>("simVertex");
   simVertexInput_ = consumes<edm::SimVertexContainer>(simVertex.getParameter<edm::InputTag>("inputTag"));
@@ -325,6 +335,8 @@ config(iConfig)
 
   const auto& P_gemDigi = iConfig.getParameter<edm::ParameterSet>("gemStripDigi");
   gemDigiToken_ = consumes<GEMDigiCollection>(P_gemDigi.getParameter<edm::InputTag>("inputTag"));
+
+  geomToken_ = esConsumes<GEMGeometry, MuonGeometryRecord>();
 
   match.reset(new MatcherManager(iConfig, consumesCollector()));
 }
@@ -442,6 +454,8 @@ void NtupleMaker::beginJob()
   m_allGemDigi_eta = new std::vector<float>;
   m_allGemDigi_z = new std::vector<float>;
   m_allGemDigi_r = new std::vector<float>;
+  m_allGemDigi_detId = new std::vector<int>;
+  m_allGemDigi_strip = new std::vector<int>;
 
   m_matchCscStubsLCT_phi = new std::vector<float>;
   m_matchCscStubsLCT_eta = new std::vector<float>;
@@ -473,6 +487,8 @@ void NtupleMaker::beginJob()
   m_matchGemDigi_eta = new std::vector<float>;
   m_matchGemDigi_z = new std::vector<float>;
   m_matchGemDigi_r = new std::vector<float>;
+  m_matchGemDigi_detId = new std::vector<int>;
+  m_matchGemDigi_strip = new std::vector<int>;
   m_matchGemDigi_matchTp = new std::vector<int>;
 
   eventTree = fs->make<TTree>("eventTree", "Event tree");
@@ -572,6 +588,8 @@ void NtupleMaker::beginJob()
   eventTree->Branch("allGemDigi_eta", &m_allGemDigi_eta);
   eventTree->Branch("allGemDigi_z", &m_allGemDigi_z);
   eventTree->Branch("allGemDigi_r", &m_allGemDigi_r);
+  eventTree->Branch("allGemDigi_detId", &m_allGemDigi_detId);
+  eventTree->Branch("allGemDigi_strip", &m_allGemDigi_strip);
 
   eventTree->Branch("matchCscStubsLCT_phi", &m_matchCscStubsLCT_phi);
   eventTree->Branch("matchCscStubsLCT_eta", &m_matchCscStubsLCT_eta);
@@ -603,6 +621,8 @@ void NtupleMaker::beginJob()
   eventTree->Branch("matchGemDigi_eta", &m_matchGemDigi_eta);
   eventTree->Branch("matchGemDigi_z", &m_matchGemDigi_z);
   eventTree->Branch("matchGemDigi_r", &m_matchGemDigi_r);
+  eventTree->Branch("matchGemDigi_detId", &m_matchGemDigi_detId);
+  eventTree->Branch("matchGemDigi_strip", &m_matchGemDigi_strip);
   eventTree->Branch("matchGemDigi_matchTp", &m_matchGemDigi_matchTp);
 
 }
@@ -710,6 +730,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   m_allGemDigi_eta->clear();
   m_allGemDigi_z->clear();
   m_allGemDigi_r->clear();
+  m_allGemDigi_detId->clear();
+  m_allGemDigi_strip->clear();
 
   m_matchCscStubsLCT_phi->clear();
   m_matchCscStubsLCT_eta->clear();
@@ -742,6 +764,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   m_matchGemDigi_eta->clear();
   m_matchGemDigi_z->clear();
   m_matchGemDigi_r->clear();
+  m_matchGemDigi_detId->clear();
+  m_matchGemDigi_strip->clear();
   m_matchGemDigi_matchTp->clear();
 
   if (DebugMode) cout << "Finished branch initialization" << endl;
@@ -762,6 +786,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<edm::SimVertexContainer> sim_vertices;
   iEvent.getByToken(simVertexInput_, sim_vertices);
   const edm::SimVertexContainer & sim_vert = *sim_vertices.product();
+
+  gemGeometry_ = &iSetup.getData(geomToken_);
 
   int tp_index = 0;
   std::vector< TrackingParticle >::const_iterator iterTP;
@@ -971,6 +997,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           m_matchGemDigi_eta->push_back(gp.eta());
           m_matchGemDigi_z->push_back(gp.z());
           m_matchGemDigi_r->push_back(gp.perp());
+          m_matchGemDigi_detId->push_back(id);
+          m_matchGemDigi_strip->push_back(gemdigi.strip());
           m_matchGemDigi_matchTp->push_back(tp_index);
         }
       }
@@ -1157,24 +1185,22 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   if (DebugMode) cout << "Finished allCLCT, started GEMDigis" << endl;
   // All GEMDigis
-  cout << "Started allgemdigi" <<endl;
   edm::Handle<GEMDigiCollection> gemDigisH_;
   iEvent.getByToken(gemDigiToken_,gemDigisH_);
   const GEMDigiCollection& gems = *gemDigisH_.product();
-  cout << "Started gemdigi iteration" <<endl;
   for (auto it = gems.begin(); it != gems.end(); ++it) {
-    cout << "Started iteration on digis in a detid--1" <<endl;
     const auto& digivec = (*it).second;
     const GEMDetId& detid = (*it).first;
-    cout << "Started iteration on digis in a detid--2" <<endl;
     for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
-      cout << "Retriving globlapoint" <<endl;
-      auto gp = match->gemDigis()->getGlobalPointDigi(detid.rawId(), *itdigi);
-      cout << "GP retrived" <<endl;
+      auto gp = match->gemDigis()->getGlobalPointDigi(detid, *itdigi);
+      // auto gp2 =  getGlobalPointDigi(detid,*itdigi); // Borrowed position function
+      // if (gp.phi() != gp2.phi()) cout << "inconsistent function" <<endl;
       m_allGemDigi_phi->push_back(gp.phi());
       m_allGemDigi_eta->push_back(gp.eta());
       m_allGemDigi_z->push_back(gp.z());
       m_allGemDigi_r->push_back(gp.perp());
+      m_allGemDigi_detId->push_back(detid.rawId());
+      m_allGemDigi_strip->push_back((*itdigi).strip());
     }
   }
 
@@ -1317,6 +1343,13 @@ std::vector<int> NtupleMaker::IntsToBinary(int n) {
   if ( n / 2 != 0) binary_ = IntsToBinary(n/2);
   binary_.push_back(n%2);
   return binary_;
+}
+
+GlobalPoint NtupleMaker::getGlobalPointDigi(unsigned int rawId, const GEMDigi& d) {
+  GEMDetId gem_id(rawId);
+  const LocalPoint& gem_lp = gemGeometry_->etaPartition(gem_id)->centreOfStrip(d.strip());
+  const GlobalPoint& gem_gp = gemGeometry_->idToDet(gem_id)->surface().toGlobal(gem_lp);
+  return gem_gp;
 }
 
 

@@ -43,17 +43,17 @@ process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+# process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1),
+    input = cms.untracked.int32(100),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(inputFile),
-    # fileNames = cms.untracked.vstring('file:step1.root'),
+    # fileNames = cms.untracked.vstring(inputFile),
+    fileNames = cms.untracked.vstring('file:step1.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -94,23 +94,37 @@ process.configurationMetadata = cms.untracked.PSet(
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
+process = addCSCTriggerRun3(process)
 
-## Run-3 patterns
-process.simCscTriggerPrimitiveDigisRun3 = process.simCscTriggerPrimitiveDigis.clone()
-process.simCscTriggerPrimitiveDigisRun3.clctParam07.useRun3Patterns = cms.bool(True)
-process.simCscTriggerPrimitiveDigisRun3.clctSLHC.useRun3Patterns = cms.bool(True)
+# ## Run-3 patterns
+# process.simCscTriggerPrimitiveDigisRun3 = process.simCscTriggerPrimitiveDigis.clone()
+# process.simCscTriggerPrimitiveDigisRun3.clctParam07.useRun3Patterns = cms.bool(True)
+# process.simCscTriggerPrimitiveDigisRun3.clctSLHC.useRun3Patterns = cms.bool(True)
 
-## Run-3 patterns with CCLUT
-process.simCscTriggerPrimitiveDigisRun3CCLUT = process.simCscTriggerPrimitiveDigisRun3.clone()
-process.simCscTriggerPrimitiveDigisRun3CCLUT.clctParam07.useComparatorCodes = cms.bool(True)
-process.simCscTriggerPrimitiveDigisRun3CCLUT.clctSLHC.useComparatorCodes = cms.bool(True)
+#
+# ## Run-3 patterns with CCLUT
+# process.simCscTriggerPrimitiveDigisRun3CCLUT = process.simCscTriggerPrimitiveDigisRun3.clone()
+# process.simCscTriggerPrimitiveDigisRun3CCLUT.clctParam07.useComparatorCodes = cms.bool(True)
+# process.simCscTriggerPrimitiveDigisRun3CCLUT.clctSLHC.useComparatorCodes = cms.bool(True)
 
-process.SimL1Emulator = cms.Sequence(process.simMuonGEMPadDigis * process.simMuonGEMPadDigiClusters * process.simCscTriggerPrimitiveDigis * process.simCscTriggerPrimitiveDigisRun3 * process.simCscTriggerPrimitiveDigisRun3CCLUT * process.simEmtfDigis)
+# process.SimL1Emulator = cms.Sequence(process.simMuonGEMPadDigis * process.simMuonGEMPadDigiClusters * process.simCscTriggerPrimitiveDigis * process.simCscTriggerPrimitiveDigisRun3 * process.simCscTriggerPrimitiveDigisRun3CCLUT * process.simEmtfDigis)
+
+process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
+# customize unpacker
+process.muonGEMDigis.useDBEMap = False
+process.SimL1Emulator = cms.Sequence(
+    process.simMuonGEMPadDigis *
+    process.simMuonGEMPadDigiClusters *
+    process.simCscTriggerPrimitiveDigis *
+    process.simCscTriggerPrimitiveDigisRun3CCLUT *
+    process.simEmtfDigis)
 process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
 
+
 # NtupleMaker
-process.TFileService = cms.Service("TFileService", fileName = cms.string('/eos/user/s/siluo/Muon/InProgress/'+datatag+'/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
-# process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out.root'), closeFileFast = cms.untracked.bool(True))
+# process.TFileService = cms.Service("TFileService", fileName = cms.string('/eos/user/s/siluo/Muon/InProgress/'+datatag+'/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
+process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out.root'), closeFileFast = cms.untracked.bool(True))
 
 from GEMCode.GEMValidation.simTrackMatching_cfi import simTrackPSet
 process.NtupleMaker = cms.EDAnalyzer('NtupleMaker',
@@ -135,8 +149,8 @@ ana.simTrack.minEta = 1.2
 ana.simTrack.maxEta = 2.4
 ana.simTrack.minPt = 3
 ana.gemSimHit.verbose = 0
-ana.gemStripDigi.verbose = 0
-ana.gemStripDigi.matchDeltaStrip = 2
+# ana.gemStripDigi.verbose = 0
+# ana.gemStripDigi.matchDeltaStrip = 2
 ana.gemPadDigi.verbose = 0
 ana.gemCoPadDigi.verbose = 0
 ana.gemPadCluster.verbose = 0
@@ -149,8 +163,17 @@ ana.cscCLCT.verbose = 0
 ana.cscCLCT.minBX = 6
 ana.cscCLCT.maxBX = 8
 ana.cscLCT.verbose = 0
+ana.cscLCT.addGhostLCTs = cms.bool(True)
 ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
-ana.gemStripDigi.inputTag = cms.InputTag("muonGEMDigis")
+# ana.gemStripDigi.inputTag = cms.InputTag("muonGEMDigis")
+ana.gemStripDigi = cms.PSet(
+    verbose = cms.int32(0),
+    inputTag = cms.InputTag("muonGEMDigis"),
+    minBX = cms.int32(-1),
+    maxBX = cms.int32(1),
+    matchDeltaStrip = cms.int32(2),
+    matchToSimLink = cms.bool(False)
+)
 process.ana = cms.Path(ana)
 
 

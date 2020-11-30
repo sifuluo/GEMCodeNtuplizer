@@ -1,9 +1,9 @@
-import os
-import sys
+import os, sys
 
 iteration = "Run4_2/"
 datasets = ["RVSMPt10PU","RVSMPt10noPU","RVSMPt100PU","RVSMPt100noPU","RVSMPt1000PU","RVSMPt1000noPU","RVSMFlatPU","RVSMFlatnoPU"]
 datasets = datasets + ["RVDMPt2PU","RVDMPt2noPU","RVDMPt10PU","RVDMPt10noPU","RVDMPt30PU","RVDMPt30noPU"]
+# datasetsjoined = " ".join(datasets)
 
 eosdir = "/eos/user/s/siluo/Muon/" + iteration
 curdir = os.path.abspath(os.path.curdir)
@@ -36,3 +36,27 @@ if True:
     writeline[6] = "log          = " + logline + ".log\n"
     writeline[12] = "queue "+str(nf)
     f.writelines(writeline)
+
+if True:
+  with open("MultiSub.sh") as fin:
+    lines = fin.readlines()
+  fn = "Submits/MultiSub.sh"
+  f = open(fn,"w")
+  lines[18] = "cd "+curdir+"/\n"
+  f.writelines(lines)
+  mode = "755"
+  os.chmod(fn,int(mode,base=8));
+
+if True:
+  lines = []
+  lines.append("#!/bin/sh\n")
+  lines.append("for i in $(ls *.sub)\n")
+  lines.append("do\n")
+  lines.append("  echo Submitting $i\n")
+  lines.append("  condor_submit $i\n")
+  lines.append("done")
+  fn = "Submits/Submission.sh"
+  f = open(fn,"w")
+  f.writelines(lines)
+  mode = "755"
+  os.chmod(fn,int(mode,base=8));

@@ -221,6 +221,7 @@ private:
   std::vector<int>*   m_allCscStubsLCT_detId;
   std::vector<int>*   m_allCscStubsLCT_keywire;
   std::vector<int>*   m_allCscStubsLCT_strip;
+  std::vector<int>*   m_allCscStubsLCT_strip8;
   std::vector<bool>*  m_allCscStubsLCT_valid;
   std::vector<int>*   m_allCscStubsLCT_type;
 
@@ -232,6 +233,7 @@ private:
 
   std::vector<int>*   m_allCscStubsCLCT_detId;
   std::vector<int>*   m_allCscStubsCLCT_strip;
+  std::vector<int>*   m_allCscStubsCLCT_strip8;
   std::vector<int>*   m_allCscStubsCLCT_hit;
   std::vector<int>*   m_allCscStubsCLCT_position;
   std::vector<bool>*  m_allCscStubsCLCT_valid;
@@ -245,6 +247,7 @@ private:
   std::vector<bool>*  m_allALCT_valid;
 
   std::vector<int>*   m_allCLCT_detId;
+  std::vector<int>*   m_allCLCT_strip8;
   std::vector<int>*   m_allCLCT_strip;
   std::vector<int>*   m_allCLCT_hit;
   std::vector<int>*   m_allCLCT_position;
@@ -270,6 +273,7 @@ private:
   std::vector<int>*   m_matchCscStubsLCT_detId;
   std::vector<int>*   m_matchCscStubsLCT_keywire;
   std::vector<int>*   m_matchCscStubsLCT_strip;
+  std::vector<int>*   m_matchCscStubsLCT_strip8;
   std::vector<bool>*  m_matchCscStubsLCT_valid;
   std::vector<int>*   m_matchCscStubsLCT_type;
 
@@ -281,6 +285,7 @@ private:
 
   std::vector<int>*   m_matchCscStubsCLCT_detId;
   std::vector<int>*   m_matchCscStubsCLCT_strip;
+  std::vector<int>*   m_matchCscStubsCLCT_strip8;
   std::vector<int>*   m_matchCscStubsCLCT_hit;
   std::vector<int>*   m_matchCscStubsCLCT_position;
   std::vector<bool>*  m_matchCscStubsCLCT_valid;
@@ -429,6 +434,7 @@ void NtupleMaker::beginJob()
   m_allCscStubsLCT_detId = new std::vector<int>;
   m_allCscStubsLCT_keywire = new std::vector<int>;
   m_allCscStubsLCT_strip = new std::vector<int>;
+  m_allCscStubsLCT_strip8 = new std::vector<int>;
   m_allCscStubsLCT_valid = new std::vector<bool>;
   m_allCscStubsLCT_type = new std::vector<int>;
 
@@ -440,6 +446,7 @@ void NtupleMaker::beginJob()
 
   m_allCscStubsCLCT_detId = new std::vector<int>;
   m_allCscStubsCLCT_strip = new std::vector<int>;
+  m_allCscStubsCLCT_strip8 = new std::vector<int>;
   m_allCscStubsCLCT_hit = new std::vector<int>;
   m_allCscStubsCLCT_position = new std::vector<int>;
   m_allCscStubsCLCT_valid = new std::vector<bool>;
@@ -454,6 +461,7 @@ void NtupleMaker::beginJob()
 
   m_allCLCT_detId = new std::vector<int>;
   m_allCLCT_strip = new std::vector<int>;
+  m_allCLCT_strip8 = new std::vector<int>;
   m_allCLCT_hit = new std::vector<int>;
   m_allCLCT_position = new std::vector<int>;
   m_allCLCT_valid = new std::vector<bool>;
@@ -478,6 +486,7 @@ void NtupleMaker::beginJob()
   m_matchCscStubsLCT_detId = new std::vector<int>;
   m_matchCscStubsLCT_keywire = new std::vector<int>;
   m_matchCscStubsLCT_strip = new std::vector<int>;
+  m_matchCscStubsLCT_strip8 = new std::vector<int>;
   m_matchCscStubsLCT_valid = new std::vector<bool>;
   m_matchCscStubsLCT_type = new std::vector<int>;
 
@@ -489,6 +498,7 @@ void NtupleMaker::beginJob()
 
   m_matchCscStubsCLCT_detId = new std::vector<int>;
   m_matchCscStubsCLCT_strip = new std::vector<int>;
+  m_matchCscStubsCLCT_strip8 = new std::vector<int>;
   m_matchCscStubsCLCT_hit = new std::vector<int>;
   m_matchCscStubsCLCT_position = new std::vector<int>;
   m_matchCscStubsCLCT_valid = new std::vector<bool>;
@@ -569,6 +579,7 @@ void NtupleMaker::beginJob()
   eventTree->Branch("allCscStubsLCT_detId", &m_allCscStubsLCT_detId);
   eventTree->Branch("allCscStubsLCT_keywire", &m_allCscStubsLCT_keywire);
   eventTree->Branch("allCscStubsLCT_strip", &m_allCscStubsLCT_strip);
+  eventTree->Branch("allCscStubsLCT_strip8", &m_allCscStubsLCT_strip8);
   eventTree->Branch("allCscStubsLCT_valid", &m_allCscStubsLCT_valid);
   eventTree->Branch("allCscStubsLCT_type", &m_allCscStubsLCT_type);
 
@@ -580,6 +591,7 @@ void NtupleMaker::beginJob()
 
   eventTree->Branch("allCscStubsCLCT_detId", &m_allCscStubsCLCT_detId);
   eventTree->Branch("allCscStubsCLCT_strip", &m_allCscStubsCLCT_strip);
+  eventTree->Branch("allCscStubsCLCT_strip8", &m_allCscStubsCLCT_strip8);
   eventTree->Branch("allCscStubsCLCT_hit", &m_allCscStubsCLCT_hit);
   eventTree->Branch("allCscStubsCLCT_position", &m_allCscStubsCLCT_position);
   eventTree->Branch("allCscStubsCLCT_valid", &m_allCscStubsCLCT_valid);
@@ -594,6 +606,7 @@ void NtupleMaker::beginJob()
 
   eventTree->Branch("allCLCT_detId", &m_allCLCT_detId);
   eventTree->Branch("allCLCT_strip", &m_allCLCT_strip);
+  eventTree->Branch("allCLCT_strip8", &m_allCLCT_strip8);
   eventTree->Branch("allCLCT_hit", &m_allCLCT_hit);
   eventTree->Branch("allCLCT_position", &m_allCLCT_position);
   eventTree->Branch("allCLCT_valid", &m_allCLCT_valid);
@@ -618,6 +631,7 @@ void NtupleMaker::beginJob()
   eventTree->Branch("matchCscStubsLCT_detId", &m_matchCscStubsLCT_detId);
   eventTree->Branch("matchCscStubsLCT_keywire", &m_matchCscStubsLCT_keywire);
   eventTree->Branch("matchCscStubsLCT_strip", &m_matchCscStubsLCT_strip);
+  eventTree->Branch("matchCscStubsLCT_strip8", &m_matchCscStubsLCT_strip8);
   eventTree->Branch("matchCscStubsLCT_valid", &m_matchCscStubsLCT_valid);
   eventTree->Branch("matchCscStubsLCT_type", &m_matchCscStubsLCT_type);
 
@@ -629,6 +643,7 @@ void NtupleMaker::beginJob()
 
   eventTree->Branch("matchCscStubsCLCT_detId", &m_matchCscStubsCLCT_detId);
   eventTree->Branch("matchCscStubsCLCT_strip", &m_matchCscStubsCLCT_strip);
+  eventTree->Branch("matchCscStubsCLCT_strip8", &m_matchCscStubsCLCT_strip8);
   eventTree->Branch("matchCscStubsCLCT_hit", &m_matchCscStubsCLCT_hit);
   eventTree->Branch("matchCscStubsCLCT_position", &m_matchCscStubsCLCT_position);
   eventTree->Branch("matchCscStubsCLCT_valid", &m_matchCscStubsCLCT_valid);
@@ -717,6 +732,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   m_allCscStubsLCT_detId->clear();
   m_allCscStubsLCT_keywire->clear();
   m_allCscStubsLCT_strip->clear();
+  m_allCscStubsLCT_strip8->clear();
   m_allCscStubsLCT_valid->clear();
   m_allCscStubsLCT_type->clear();
 
@@ -728,6 +744,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   m_allCscStubsCLCT_detId->clear();
   m_allCscStubsCLCT_strip->clear();
+  m_allCscStubsCLCT_strip8->clear();
   m_allCscStubsCLCT_hit->clear();
   m_allCscStubsCLCT_position->clear();
   m_allCscStubsCLCT_valid->clear();
@@ -742,6 +759,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   m_allCLCT_detId->clear();
   m_allCLCT_strip->clear();
+  m_allCLCT_strip8->clear();
   m_allCLCT_hit->clear();
   m_allCLCT_position->clear();
   m_allCLCT_valid->clear();
@@ -766,6 +784,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   m_matchCscStubsLCT_detId->clear();
   m_matchCscStubsLCT_keywire->clear();
   m_matchCscStubsLCT_strip->clear();
+  m_matchCscStubsLCT_strip8->clear();
   m_matchCscStubsLCT_valid->clear();
   m_matchCscStubsLCT_type->clear();
 
@@ -778,6 +797,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   m_matchCscStubsCLCT_detId->clear();
   m_matchCscStubsCLCT_strip->clear();
+  m_matchCscStubsCLCT_strip8->clear();
   m_matchCscStubsCLCT_hit->clear();
   m_matchCscStubsCLCT_position->clear();
   m_matchCscStubsCLCT_valid->clear();
@@ -978,6 +998,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           m_matchCscStubsLCT_detId->push_back(detid_.rawId());
           m_matchCscStubsLCT_keywire->push_back(digi_.getKeyWG());
           m_matchCscStubsLCT_strip->push_back(digi_.getStrip());
+          m_matchCscStubsLCT_strip8->push_back(digi_.getFractionalStrip(8));
           m_matchCscStubsLCT_valid->push_back(digi_.isValid());
           m_matchCscStubsLCT_type->push_back(digi_.getType());
           if (Print_matchCscStubs) cout << "detid_int = " <<detid_int<<", detid = " << int(detid_) << ", rawId = " << detid_.rawId() << endl;
@@ -1002,6 +1023,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           if (doprintc && clctmultihit) cout << "CLCT Multihit found for matchCscStubsCLCT" << endl;
           m_matchCscStubsCLCT_detId->push_back(detid_.rawId());
           m_matchCscStubsCLCT_strip->push_back(clctDigi.getStrip());
+          m_matchCscStubsCLCT_strip8->push_back(clctDigi.getFractionalStrip(8));
           m_matchCscStubsCLCT_valid->push_back(clctDigi.isValid());
           m_matchCscStubsCLCT_bend->push_back(clctDigi.getBend());
           m_matchCscStubsCLCT_pattern->push_back(clctDigi.getRun3Pattern());
@@ -1120,6 +1142,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       m_allCscStubsLCT_detId->push_back(detid.rawId());
       m_allCscStubsLCT_keywire->push_back((*itdigi).getKeyWG());
       m_allCscStubsLCT_strip->push_back((*itdigi).getStrip());
+      m_allCscStubsLCT_strip8->push_back((*itdigi).getFractionalStrip(8));
       m_allCscStubsLCT_valid->push_back((*itdigi).isValid());
       m_allCscStubsLCT_type->push_back((*itdigi).getType());
       // allCscStubsALCTs
@@ -1144,6 +1167,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if (doprintc && clctmultihit) cout << "CLCT Multihit found for allCscStubsCLCT" << endl;
       m_allCscStubsCLCT_detId->push_back(detid.rawId());
       m_allCscStubsCLCT_strip->push_back(clctDigi.getStrip());
+      m_allCscStubsCLCT_strip8->push_back(clctDigi.getFractionalStrip(8));
       m_allCscStubsCLCT_valid->push_back(clctDigi.isValid());
       m_allCscStubsCLCT_bend->push_back(clctDigi.getBend());
       m_allCscStubsCLCT_pattern->push_back(clctDigi.getRun3Pattern());
@@ -1194,6 +1218,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if (Print_all && Print_CLCT && clctmultihit) cout << "CLCT Multihit found for allCLCT" << endl;
       m_allCLCT_detId->push_back(detid.rawId());
       m_allCLCT_strip->push_back((*itdigi).getStrip());
+      m_allCLCT_strip8->push_back((*itdigi).getFractionalStrip(8));
       m_allCLCT_valid->push_back((*itdigi).isValid());
       m_allCLCT_bend->push_back((*itdigi).getBend());
       m_allCLCT_pattern->push_back((*itdigi).getRun3Pattern());

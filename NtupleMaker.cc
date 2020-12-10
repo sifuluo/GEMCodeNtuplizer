@@ -19,6 +19,9 @@
 // GEMCode
 #include "GEMCode/GEMValidation/interface/MatcherManager.h"
 
+// NtupleMaker tools
+#include "GEMCode/GEMValidation/test/TreeDigi.cc"
+
 // Other tools
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
@@ -102,15 +105,16 @@ public:
   virtual void endJob();
   virtual void analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
-  struct DigiContent{
-    int detid;
-    int strip;
-    int wire;
-    int quality;
-    std::vector<std::vector<int> > hits2D;
-    std::vector<int> hits;
-    std::vector<int> positions;
-  };
+  // struct DigiContent{
+  //   int detid;
+  //   int strip;
+  //   int wire;
+  //   int quality;
+  //   std::vector<std::vector<int> > hits2D;
+  //   std::vector<int> hits;
+  //   std::vector<int> positions;
+  // };
+
   virtual void PrintHits(int iset, int idigi = -1);
   virtual int SaveHitMatrix(std::vector< std::vector<unsigned short> > hits, std::vector<int>* b_hit, std::vector<int>* b_pos, bool doprint = false, bool isclct = false);
   virtual std::vector<int> IntsToBinary(int n);
@@ -211,99 +215,9 @@ private:
   std::vector<int>*   m_matchmuon_type;
   std::vector<int>*   m_matchmuon_quality;
 
-  std::vector<float>* m_allCscStubsLCT_phi;
-  std::vector<float>* m_allCscStubsLCT_eta;
-  std::vector<float>* m_allCscStubsLCT_z;
-  std::vector<float>* m_allCscStubsLCT_r;
-  std::vector<int>*   m_allCscStubsLCT_bend;
-  std::vector<int>*   m_allCscStubsLCT_pattern;
-  std::vector<int>*   m_allCscStubsLCT_slope;
-  std::vector<int>*   m_allCscStubsLCT_quality;
-  std::vector<int>*   m_allCscStubsLCT_detId;
-  std::vector<int>*   m_allCscStubsLCT_keywire;
-  std::vector<int>*   m_allCscStubsLCT_strip;
-  std::vector<int>*   m_allCscStubsLCT_strip8;
-  std::vector<bool>*  m_allCscStubsLCT_valid;
-  std::vector<int>*   m_allCscStubsLCT_type;
-
-  std::vector<int>*   m_allCscStubsALCT_detId;
-  std::vector<int>*   m_allCscStubsALCT_keywire;
-  std::vector<int>*   m_allCscStubsALCT_hit;
-  std::vector<int>*   m_allCscStubsALCT_position;
-  std::vector<bool>*  m_allCscStubsALCT_valid;
-
-  std::vector<int>*   m_allCscStubsCLCT_detId;
-  std::vector<int>*   m_allCscStubsCLCT_strip;
-  std::vector<int>*   m_allCscStubsCLCT_strip8;
-  std::vector<int>*   m_allCscStubsCLCT_hit;
-  std::vector<int>*   m_allCscStubsCLCT_position;
-  std::vector<bool>*  m_allCscStubsCLCT_valid;
-  std::vector<int>*   m_allCscStubsCLCT_bend;
-  std::vector<int>*   m_allCscStubsCLCT_pattern;
-  std::vector<int>*   m_allCscStubsCLCT_slope;
-
-  std::vector<int>*   m_allALCT_detId;
-  std::vector<int>*   m_allALCT_keywire;
-  std::vector<int>*   m_allALCT_hit;
-  std::vector<int>*   m_allALCT_position;
-  std::vector<bool>*  m_allALCT_valid;
-
-  std::vector<int>*   m_allCLCT_detId;
-  std::vector<int>*   m_allCLCT_strip8;
-  std::vector<int>*   m_allCLCT_strip;
-  std::vector<int>*   m_allCLCT_hit;
-  std::vector<int>*   m_allCLCT_position;
-  std::vector<bool>*  m_allCLCT_valid;
-  std::vector<int>*   m_allCLCT_bend;
-  std::vector<int>*   m_allCLCT_pattern;
-  std::vector<int>*   m_allCLCT_slope;
-
-  std::vector<float>* m_allGemDigi_phi;
-  std::vector<float>* m_allGemDigi_eta;
-  std::vector<float>* m_allGemDigi_z;
-  std::vector<float>* m_allGemDigi_r;
-  std::vector<int>*   m_allGemDigi_detId;
-  std::vector<int>*   m_allGemDigi_strip;
-
-  std::vector<float>* m_matchCscStubsLCT_phi;
-  std::vector<float>* m_matchCscStubsLCT_eta;
-  std::vector<float>* m_matchCscStubsLCT_z;
-  std::vector<float>* m_matchCscStubsLCT_r;
-  std::vector<int>*   m_matchCscStubsLCT_bend;
-  std::vector<int>*   m_matchCscStubsLCT_pattern;
-  std::vector<int>*   m_matchCscStubsLCT_slope;
-  std::vector<int>*   m_matchCscStubsLCT_matchTp;
-  std::vector<int>*   m_matchCscStubsLCT_quality;
-  std::vector<int>*   m_matchCscStubsLCT_detId;
-  std::vector<int>*   m_matchCscStubsLCT_keywire;
-  std::vector<int>*   m_matchCscStubsLCT_strip;
-  std::vector<int>*   m_matchCscStubsLCT_strip8;
-  std::vector<bool>*  m_matchCscStubsLCT_valid;
-  std::vector<int>*   m_matchCscStubsLCT_type;
-
-  std::vector<int>*   m_matchCscStubsALCT_detId;
-  std::vector<int>*   m_matchCscStubsALCT_keywire;
-  std::vector<int>*   m_matchCscStubsALCT_hit;
-  std::vector<int>*   m_matchCscStubsALCT_position;
-  std::vector<bool>*  m_matchCscStubsALCT_valid;
-
-  std::vector<int>*   m_matchCscStubsCLCT_detId;
-  std::vector<int>*   m_matchCscStubsCLCT_strip;
-  std::vector<int>*   m_matchCscStubsCLCT_strip8;
-  std::vector<int>*   m_matchCscStubsCLCT_hit;
-  std::vector<int>*   m_matchCscStubsCLCT_position;
-  std::vector<bool>*  m_matchCscStubsCLCT_valid;
-  std::vector<int>*   m_matchCscStubsCLCT_bend;
-  std::vector<int>*   m_matchCscStubsCLCT_pattern;
-  std::vector<int>*   m_matchCscStubsCLCT_slope;
-
-  std::vector<float>* m_matchGemDigi_phi;
-  std::vector<float>* m_matchGemDigi_eta;
-  std::vector<float>* m_matchGemDigi_z;
-  std::vector<float>* m_matchGemDigi_r;
-  std::vector<int>*   m_matchGemDigi_detId;
-  std::vector<int>*   m_matchGemDigi_strip;
-  std::vector<int>*   m_matchGemDigi_matchTp;
+  TreeDigi *allCscStubsLCT, *allCscStubsALCT, *allCscStubsCLCT;
+  TreeDigi *allALCT, *allCLCT, *allGemDigi;
+  TreeDigi *matchCscStubsLCT, *matchCscStubsALCT, *matchCscStubsCLCT, *matchGemDigi;
 
   std::unique_ptr<MatcherManager> match;
 
@@ -429,100 +343,6 @@ void NtupleMaker::beginJob()
   m_matchmuon_type   = new std::vector<int>;
   m_matchmuon_quality= new std::vector<int>;
 
-  m_allCscStubsLCT_phi = new std::vector<float>;
-  m_allCscStubsLCT_eta = new std::vector<float>;
-  m_allCscStubsLCT_z = new std::vector<float>;
-  m_allCscStubsLCT_r = new std::vector<float>;
-  m_allCscStubsLCT_bend = new std::vector<int>;
-  m_allCscStubsLCT_pattern = new std::vector<int>;
-  m_allCscStubsLCT_slope = new std::vector<int>;
-  m_allCscStubsLCT_quality = new std::vector<int>;
-  m_allCscStubsLCT_detId = new std::vector<int>;
-  m_allCscStubsLCT_keywire = new std::vector<int>;
-  m_allCscStubsLCT_strip = new std::vector<int>;
-  m_allCscStubsLCT_strip8 = new std::vector<int>;
-  m_allCscStubsLCT_valid = new std::vector<bool>;
-  m_allCscStubsLCT_type = new std::vector<int>;
-
-  m_allCscStubsALCT_detId = new std::vector<int>;
-  m_allCscStubsALCT_keywire = new std::vector<int>;
-  m_allCscStubsALCT_hit = new std::vector<int>;
-  m_allCscStubsALCT_position = new std::vector<int>;
-  m_allCscStubsALCT_valid = new std::vector<bool>;
-
-  m_allCscStubsCLCT_detId = new std::vector<int>;
-  m_allCscStubsCLCT_strip = new std::vector<int>;
-  m_allCscStubsCLCT_strip8 = new std::vector<int>;
-  m_allCscStubsCLCT_hit = new std::vector<int>;
-  m_allCscStubsCLCT_position = new std::vector<int>;
-  m_allCscStubsCLCT_valid = new std::vector<bool>;
-  m_allCscStubsCLCT_bend = new std::vector<int>;
-  m_allCscStubsCLCT_pattern = new std::vector<int>;
-  m_allCscStubsCLCT_slope = new std::vector<int>;
-
-  m_allALCT_detId = new std::vector<int>;
-  m_allALCT_keywire = new std::vector<int>;
-  m_allALCT_hit = new std::vector<int>;
-  m_allALCT_position = new std::vector<int>;
-  m_allALCT_valid = new std::vector<bool>;
-
-  m_allCLCT_detId = new std::vector<int>;
-  m_allCLCT_strip = new std::vector<int>;
-  m_allCLCT_strip8 = new std::vector<int>;
-  m_allCLCT_hit = new std::vector<int>;
-  m_allCLCT_position = new std::vector<int>;
-  m_allCLCT_valid = new std::vector<bool>;
-  m_allCLCT_bend = new std::vector<int>;
-  m_allCLCT_pattern = new std::vector<int>;
-  m_allCLCT_slope = new std::vector<int>;
-
-  m_allGemDigi_phi = new std::vector<float>;
-  m_allGemDigi_eta = new std::vector<float>;
-  m_allGemDigi_z = new std::vector<float>;
-  m_allGemDigi_r = new std::vector<float>;
-  m_allGemDigi_detId = new std::vector<int>;
-  m_allGemDigi_strip = new std::vector<int>;
-
-  m_matchCscStubsLCT_phi = new std::vector<float>;
-  m_matchCscStubsLCT_eta = new std::vector<float>;
-  m_matchCscStubsLCT_z = new std::vector<float>;
-  m_matchCscStubsLCT_r = new std::vector<float>;
-  m_matchCscStubsLCT_bend = new std::vector<int>;
-  m_matchCscStubsLCT_pattern = new std::vector<int>;
-  m_matchCscStubsLCT_slope = new std::vector<int>;
-  m_matchCscStubsLCT_matchTp = new std::vector<int>;
-  m_matchCscStubsLCT_quality = new std::vector<int>;
-  m_matchCscStubsLCT_detId = new std::vector<int>;
-  m_matchCscStubsLCT_keywire = new std::vector<int>;
-  m_matchCscStubsLCT_strip = new std::vector<int>;
-  m_matchCscStubsLCT_strip8 = new std::vector<int>;
-  m_matchCscStubsLCT_valid = new std::vector<bool>;
-  m_matchCscStubsLCT_type = new std::vector<int>;
-
-  m_matchCscStubsALCT_detId = new std::vector<int>;
-  m_matchCscStubsALCT_keywire = new std::vector<int>;
-  m_matchCscStubsALCT_hit = new std::vector<int>;
-  m_matchCscStubsALCT_position = new std::vector<int>;
-  m_matchCscStubsALCT_valid = new std::vector<bool>;
-
-  m_matchCscStubsCLCT_detId = new std::vector<int>;
-  m_matchCscStubsCLCT_strip = new std::vector<int>;
-  m_matchCscStubsCLCT_strip8 = new std::vector<int>;
-  m_matchCscStubsCLCT_hit = new std::vector<int>;
-  m_matchCscStubsCLCT_position = new std::vector<int>;
-  m_matchCscStubsCLCT_valid = new std::vector<bool>;
-  m_matchCscStubsCLCT_bend = new std::vector<int>;
-  m_matchCscStubsCLCT_pattern = new std::vector<int>;
-  m_matchCscStubsCLCT_slope = new std::vector<int>;
-
-  m_matchGemDigi_phi = new std::vector<float>;
-  m_matchGemDigi_eta = new std::vector<float>;
-  m_matchGemDigi_z = new std::vector<float>;
-  m_matchGemDigi_r = new std::vector<float>;
-  m_matchGemDigi_detId = new std::vector<int>;
-  m_matchGemDigi_strip = new std::vector<int>;
-  m_matchGemDigi_matchTp = new std::vector<int>;
-
   eventTree = fs->make<TTree>("eventTree", "Event tree");
 
   eventTree->Branch("tp_pt",     &m_tp_pt);
@@ -579,99 +399,27 @@ void NtupleMaker::beginJob()
   eventTree->Branch("matchmuon_type",&m_matchmuon_type);
   eventTree->Branch("matchmuon_quality",&m_matchmuon_quality);
 
-  eventTree->Branch("allCscStubsLCT_phi", &m_allCscStubsLCT_phi);
-  eventTree->Branch("allCscStubsLCT_eta", &m_allCscStubsLCT_eta);
-  eventTree->Branch("allCscStubsLCT_z", &m_allCscStubsLCT_z);
-  eventTree->Branch("allCscStubsLCT_r", &m_allCscStubsLCT_r);
-  eventTree->Branch("allCscStubsLCT_bend", &m_allCscStubsLCT_bend);
-  eventTree->Branch("allCscStubsLCT_pattern", &m_allCscStubsLCT_pattern);
-  eventTree->Branch("allCscStubsLCT_slope", &m_allCscStubsLCT_slope);
-  eventTree->Branch("allCscStubsLCT_quality", &m_allCscStubsLCT_quality);
-  eventTree->Branch("allCscStubsLCT_detId", &m_allCscStubsLCT_detId);
-  eventTree->Branch("allCscStubsLCT_keywire", &m_allCscStubsLCT_keywire);
-  eventTree->Branch("allCscStubsLCT_strip", &m_allCscStubsLCT_strip);
-  eventTree->Branch("allCscStubsLCT_strip8", &m_allCscStubsLCT_strip8);
-  eventTree->Branch("allCscStubsLCT_valid", &m_allCscStubsLCT_valid);
-  eventTree->Branch("allCscStubsLCT_type", &m_allCscStubsLCT_type);
+  allCscStubsLCT = new TreeDigi();
+  allCscStubsALCT = new TreeDigi();
+  allCscStubsCLCT = new TreeDigi();
+  allALCT = new TreeDigi();
+  allCLCT = new TreeDigi();
+  allGemDigi = new TreeDigi();
+  matchCscStubsLCT = new TreeDigi();
+  matchCscStubsALCT = new TreeDigi();
+  matchCscStubsCLCT = new TreeDigi();
+  matchGemDigi = new TreeDigi();
 
-  eventTree->Branch("allCscStubsALCT_detId", &m_allCscStubsALCT_detId);
-  eventTree->Branch("allCscStubsALCT_keywire", &m_allCscStubsALCT_keywire);
-  eventTree->Branch("allCscStubsALCT_hit", &m_allCscStubsALCT_hit);
-  eventTree->Branch("allCscStubsALCT_position", &m_allCscStubsALCT_position);
-  eventTree->Branch("allCscStubsALCT_valid", &m_allCscStubsALCT_valid);
-
-  eventTree->Branch("allCscStubsCLCT_detId", &m_allCscStubsCLCT_detId);
-  eventTree->Branch("allCscStubsCLCT_strip", &m_allCscStubsCLCT_strip);
-  eventTree->Branch("allCscStubsCLCT_strip8", &m_allCscStubsCLCT_strip8);
-  eventTree->Branch("allCscStubsCLCT_hit", &m_allCscStubsCLCT_hit);
-  eventTree->Branch("allCscStubsCLCT_position", &m_allCscStubsCLCT_position);
-  eventTree->Branch("allCscStubsCLCT_valid", &m_allCscStubsCLCT_valid);
-  eventTree->Branch("allCscStubsCLCT_bend", &m_allCscStubsCLCT_bend);
-  eventTree->Branch("allCscStubsCLCT_pattern", &m_allCscStubsCLCT_pattern);
-  eventTree->Branch("allCscStubsCLCT_slope", &m_allCscStubsCLCT_slope);
-
-  eventTree->Branch("allALCT_detId", &m_allALCT_detId);
-  eventTree->Branch("allALCT_keywire", &m_allALCT_keywire);
-  eventTree->Branch("allALCT_hit", &m_allALCT_hit);
-  eventTree->Branch("allALCT_position", &m_allALCT_position);
-  eventTree->Branch("allALCT_valid", &m_allALCT_valid);
-
-  eventTree->Branch("allCLCT_detId", &m_allCLCT_detId);
-  eventTree->Branch("allCLCT_strip", &m_allCLCT_strip);
-  eventTree->Branch("allCLCT_strip8", &m_allCLCT_strip8);
-  eventTree->Branch("allCLCT_hit", &m_allCLCT_hit);
-  eventTree->Branch("allCLCT_position", &m_allCLCT_position);
-  eventTree->Branch("allCLCT_valid", &m_allCLCT_valid);
-  eventTree->Branch("allCLCT_bend", &m_allCLCT_bend);
-  eventTree->Branch("allCLCT_pattern", &m_allCLCT_pattern);
-  eventTree->Branch("allCLCT_slope", &m_allCLCT_slope);
-
-  eventTree->Branch("allGemDigi_phi", &m_allGemDigi_phi);
-  eventTree->Branch("allGemDigi_eta", &m_allGemDigi_eta);
-  eventTree->Branch("allGemDigi_z", &m_allGemDigi_z);
-  eventTree->Branch("allGemDigi_r", &m_allGemDigi_r);
-  eventTree->Branch("allGemDigi_detId", &m_allGemDigi_detId);
-  eventTree->Branch("allGemDigi_strip", &m_allGemDigi_strip);
-
-  eventTree->Branch("matchCscStubsLCT_phi", &m_matchCscStubsLCT_phi);
-  eventTree->Branch("matchCscStubsLCT_eta", &m_matchCscStubsLCT_eta);
-  eventTree->Branch("matchCscStubsLCT_z", &m_matchCscStubsLCT_z);
-  eventTree->Branch("matchCscStubsLCT_r", &m_matchCscStubsLCT_r);
-  eventTree->Branch("matchCscStubsLCT_bend", &m_matchCscStubsLCT_bend);
-  eventTree->Branch("matchCscStubsLCT_pattern", &m_matchCscStubsLCT_pattern);
-  eventTree->Branch("matchCscStubsLCT_slope", &m_matchCscStubsLCT_slope);
-  eventTree->Branch("matchCscStubsLCT_matchTp", &m_matchCscStubsLCT_matchTp);
-  eventTree->Branch("matchCscStubsLCT_quality", &m_matchCscStubsLCT_quality);
-  eventTree->Branch("matchCscStubsLCT_detId", &m_matchCscStubsLCT_detId);
-  eventTree->Branch("matchCscStubsLCT_keywire", &m_matchCscStubsLCT_keywire);
-  eventTree->Branch("matchCscStubsLCT_strip", &m_matchCscStubsLCT_strip);
-  eventTree->Branch("matchCscStubsLCT_strip8", &m_matchCscStubsLCT_strip8);
-  eventTree->Branch("matchCscStubsLCT_valid", &m_matchCscStubsLCT_valid);
-  eventTree->Branch("matchCscStubsLCT_type", &m_matchCscStubsLCT_type);
-
-  eventTree->Branch("matchCscStubsALCT_detId", &m_matchCscStubsALCT_detId);
-  eventTree->Branch("matchCscStubsALCT_keywire", &m_matchCscStubsALCT_keywire);
-  eventTree->Branch("matchCscStubsALCT_hit", &m_matchCscStubsALCT_hit);
-  eventTree->Branch("matchCscStubsALCT_position", &m_matchCscStubsALCT_position);
-  eventTree->Branch("matchCscStubsALCT_valid", &m_matchCscStubsALCT_valid);
-
-  eventTree->Branch("matchCscStubsCLCT_detId", &m_matchCscStubsCLCT_detId);
-  eventTree->Branch("matchCscStubsCLCT_strip", &m_matchCscStubsCLCT_strip);
-  eventTree->Branch("matchCscStubsCLCT_strip8", &m_matchCscStubsCLCT_strip8);
-  eventTree->Branch("matchCscStubsCLCT_hit", &m_matchCscStubsCLCT_hit);
-  eventTree->Branch("matchCscStubsCLCT_position", &m_matchCscStubsCLCT_position);
-  eventTree->Branch("matchCscStubsCLCT_valid", &m_matchCscStubsCLCT_valid);
-  eventTree->Branch("matchCscStubsCLCT_bend", &m_matchCscStubsCLCT_bend);
-  eventTree->Branch("matchCscStubsCLCT_pattern", &m_matchCscStubsCLCT_pattern);
-  eventTree->Branch("matchCscStubsCLCT_slope", &m_matchCscStubsCLCT_slope);
-
-  eventTree->Branch("matchGemDigi_phi", &m_matchGemDigi_phi);
-  eventTree->Branch("matchGemDigi_eta", &m_matchGemDigi_eta);
-  eventTree->Branch("matchGemDigi_z", &m_matchGemDigi_z);
-  eventTree->Branch("matchGemDigi_r", &m_matchGemDigi_r);
-  eventTree->Branch("matchGemDigi_detId", &m_matchGemDigi_detId);
-  eventTree->Branch("matchGemDigi_strip", &m_matchGemDigi_strip);
-  eventTree->Branch("matchGemDigi_matchTp", &m_matchGemDigi_matchTp);
+  allCscStubsLCT->Init(eventTree,"allCscStubsLCT",0,false);
+  allCscStubsALCT->Init(eventTree,"allCscStubsALCT",1,false);
+  allCscStubsCLCT->Init(eventTree,"allCscStubsCLCT",2,false);
+  allALCT->Init(eventTree,"allALCT",1,false);
+  allCLCT->Init(eventTree,"allCLCT",2,false);
+  allGemDigi->Init(eventTree,"allGemDigi",3,false);
+  matchCscStubsLCT->Init(eventTree,"matchCscStubsLCT",0,true);
+  matchCscStubsALCT->Init(eventTree,"matchCscStubsALCT",1,false);
+  matchCscStubsCLCT->Init(eventTree,"matchCscStubsCLCT",2,false);
+  matchGemDigi->Init(eventTree,"matchGemDigi",3,true);
 
 }
 
@@ -737,100 +485,16 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   m_matchmuon_type->clear();
   m_matchmuon_quality->clear();
 
-  m_allCscStubsLCT_phi->clear();
-  m_allCscStubsLCT_eta->clear();
-  m_allCscStubsLCT_z->clear();
-  m_allCscStubsLCT_r->clear();
-  m_allCscStubsLCT_bend->clear();
-  m_allCscStubsLCT_pattern->clear();
-  m_allCscStubsLCT_slope->clear();
-  m_allCscStubsLCT_quality->clear();
-  m_allCscStubsLCT_detId->clear();
-  m_allCscStubsLCT_keywire->clear();
-  m_allCscStubsLCT_strip->clear();
-  m_allCscStubsLCT_strip8->clear();
-  m_allCscStubsLCT_valid->clear();
-  m_allCscStubsLCT_type->clear();
-
-  m_allCscStubsALCT_detId->clear();
-  m_allCscStubsALCT_keywire->clear();
-  m_allCscStubsALCT_hit->clear();
-  m_allCscStubsALCT_position->clear();
-  m_allCscStubsALCT_valid->clear();
-
-  m_allCscStubsCLCT_detId->clear();
-  m_allCscStubsCLCT_strip->clear();
-  m_allCscStubsCLCT_strip8->clear();
-  m_allCscStubsCLCT_hit->clear();
-  m_allCscStubsCLCT_position->clear();
-  m_allCscStubsCLCT_valid->clear();
-  m_allCscStubsCLCT_bend->clear();
-  m_allCscStubsCLCT_pattern->clear();
-  m_allCscStubsCLCT_slope->clear();
-
-  m_allALCT_detId->clear();
-  m_allALCT_keywire->clear();
-  m_allALCT_hit->clear();
-  m_allALCT_position->clear();
-  m_allALCT_valid->clear();
-
-  m_allCLCT_detId->clear();
-  m_allCLCT_strip->clear();
-  m_allCLCT_strip8->clear();
-  m_allCLCT_hit->clear();
-  m_allCLCT_position->clear();
-  m_allCLCT_valid->clear();
-  m_allCLCT_bend->clear();
-  m_allCLCT_pattern->clear();
-  m_allCLCT_slope->clear();
-
-  m_allGemDigi_phi->clear();
-  m_allGemDigi_eta->clear();
-  m_allGemDigi_z->clear();
-  m_allGemDigi_r->clear();
-  m_allGemDigi_detId->clear();
-  m_allGemDigi_strip->clear();
-
-  m_matchCscStubsLCT_phi->clear();
-  m_matchCscStubsLCT_eta->clear();
-  m_matchCscStubsLCT_z->clear();
-  m_matchCscStubsLCT_r->clear();
-  m_matchCscStubsLCT_bend->clear();
-  m_matchCscStubsLCT_pattern->clear();
-  m_matchCscStubsLCT_slope->clear();
-  m_matchCscStubsLCT_matchTp->clear();
-  m_matchCscStubsLCT_quality->clear();
-  m_matchCscStubsLCT_detId->clear();
-  m_matchCscStubsLCT_keywire->clear();
-  m_matchCscStubsLCT_strip->clear();
-  m_matchCscStubsLCT_strip8->clear();
-  m_matchCscStubsLCT_valid->clear();
-  m_matchCscStubsLCT_type->clear();
-
-
-  m_matchCscStubsALCT_detId->clear();
-  m_matchCscStubsALCT_keywire->clear();
-  m_matchCscStubsALCT_hit->clear();
-  m_matchCscStubsALCT_position->clear();
-  m_matchCscStubsALCT_valid->clear();
-
-  m_matchCscStubsCLCT_detId->clear();
-  m_matchCscStubsCLCT_strip->clear();
-  m_matchCscStubsCLCT_strip8->clear();
-  m_matchCscStubsCLCT_hit->clear();
-  m_matchCscStubsCLCT_position->clear();
-  m_matchCscStubsCLCT_valid->clear();
-  m_matchCscStubsCLCT_bend->clear();
-  m_matchCscStubsCLCT_pattern->clear();
-  m_matchCscStubsCLCT_slope->clear();
-
-  m_matchGemDigi_phi->clear();
-  m_matchGemDigi_eta->clear();
-  m_matchGemDigi_z->clear();
-  m_matchGemDigi_r->clear();
-  m_matchGemDigi_detId->clear();
-  m_matchGemDigi_strip->clear();
-  m_matchGemDigi_matchTp->clear();
+  allCscStubsLCT->Reset();
+  allCscStubsALCT->Reset();
+  allCscStubsCLCT->Reset();
+  allALCT->Reset();
+  allCLCT->Reset();
+  allGemDigi->Reset();
+  matchCscStubsLCT->Reset();
+  matchCscStubsALCT->Reset();
+  matchCscStubsCLCT->Reset();
+  matchGemDigi->Reset();
 
   if (DebugMode) cout << "Finished branch initialization" << endl;
 
@@ -1007,21 +671,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         for (auto digi_ : cscStubs->lctsInChamber(detid_) ){
           if (DebugMode) cout << "" << endl;
           auto gp = cscStubs->getGlobalPosition(detid_int,digi_);
-          m_matchCscStubsLCT_phi->push_back(gp.phi());
-          m_matchCscStubsLCT_eta->push_back(gp.eta());
-          m_matchCscStubsLCT_z->push_back(gp.z());
-          m_matchCscStubsLCT_r->push_back(gp.perp());
-          m_matchCscStubsLCT_bend->push_back(digi_.getBend());
-          m_matchCscStubsLCT_pattern->push_back(digi_.getRun3Pattern());
-          m_matchCscStubsLCT_slope->push_back(digi_.getSlope());
-          m_matchCscStubsLCT_matchTp->push_back(tp_index);
-          m_matchCscStubsLCT_quality->push_back(digi_.getQuality());
-          m_matchCscStubsLCT_detId->push_back(detid_.rawId());
-          m_matchCscStubsLCT_keywire->push_back(digi_.getKeyWG());
-          m_matchCscStubsLCT_strip->push_back(digi_.getStrip());
-          m_matchCscStubsLCT_strip8->push_back(digi_.getFractionalStrip(8));
-          m_matchCscStubsLCT_valid->push_back(digi_.isValid());
-          m_matchCscStubsLCT_type->push_back(digi_.getType());
+          matchCscStubsLCT->FillGP(gp);
+          matchCscStubsLCT->FillLCT(digi_,detid_.rawId(),tp_index);
           if (Print_matchCscStubs) cout << "detid_int = " <<detid_int<<", detid = " << int(detid_) << ", rawId = " << detid_.rawId() << endl;
 
           // matchCscStubsALCT
@@ -1029,26 +680,20 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           std::vector< std::vector<unsigned short> > alcthits = alctDigi.getHits();
           if (doprinta) cout << "For matchCscStubsALCTs; DetId: "<< detid_.rawId() <<", Digi Index: " << digi_index << ", keywire: "<< alctDigi.getKeyWG()<<" , lctDigiWire = "<<digi_.getKeyWG()<<endl;
           if (alctDigi.getKeyWG() != digi_.getKeyWG() && doprinta) cout << "Inconsistent keywire: alctDigiWire = "<< alctDigi.getKeyWG() <<" , lctDigiWire = "<<digi_.getKeyWG()<<endl;
-          int alctmultihit = SaveHitMatrix(alcthits, m_matchCscStubsALCT_hit, m_matchCscStubsALCT_position,doprinta,false);
+          // int alctmultihit = SaveHitMatrix(alcthits, m_matchCscStubsALCT_hit, m_matchCscStubsALCT_position,doprinta,false);
+          int alctmultihit = SaveHitMatrix(alcthits, matchCscStubsALCT->hit, matchCscStubsALCT->position,doprinta,false);
           if (doprinta && alctmultihit) cout << "ALCT Multihit found for matchCscStubsALCT" << endl;
-          m_matchCscStubsALCT_detId->push_back(detid_.rawId());
-          m_matchCscStubsALCT_keywire->push_back(alctDigi.getKeyWG());
-          m_matchCscStubsALCT_valid->push_back(alctDigi.isValid());
+          matchCscStubsALCT->FillALCT(alctDigi,detid_.rawId());
 
           // matchCscStubsCLCT
           const auto& clctDigi = digi_.getCLCT();
           std::vector< std::vector<unsigned short> > clcthits = clctDigi.getHits();
           if (doprintc) cout << "For matchCscStubsCLCTs; DetId: "<< detid_.rawId() <<", Digi Index: " << digi_index << ", strip: "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< digi_.getStrip()<<endl;
           if (clctDigi.getStrip() != digi_.getStrip() && doprintc) cout << "Inconsistent strip: clctDigiStrip = "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< digi_.getStrip() <<endl;
-          int clctmultihit = SaveHitMatrix(clcthits, m_matchCscStubsCLCT_hit, m_matchCscStubsCLCT_position,doprintc,true);
+          // int clctmultihit = SaveHitMatrix(clcthits, m_matchCscStubsCLCT_hit, m_matchCscStubsCLCT_position,doprintc,true);
+          int clctmultihit = SaveHitMatrix(clcthits, matchCscStubsCLCT->hit, matchCscStubsCLCT->position,doprintc,true);
           if (doprintc && clctmultihit) cout << "CLCT Multihit found for matchCscStubsCLCT" << endl;
-          m_matchCscStubsCLCT_detId->push_back(detid_.rawId());
-          m_matchCscStubsCLCT_strip->push_back(clctDigi.getStrip());
-          m_matchCscStubsCLCT_strip8->push_back(clctDigi.getFractionalStrip(8));
-          m_matchCscStubsCLCT_valid->push_back(clctDigi.isValid());
-          m_matchCscStubsCLCT_bend->push_back(clctDigi.getBend());
-          m_matchCscStubsCLCT_pattern->push_back(clctDigi.getRun3Pattern());
-          m_matchCscStubsCLCT_slope->push_back(clctDigi.getSlope());
+          matchCscStubsCLCT->FillCLCT(clctDigi,detid_.rawId());
 
           digicount++;
         }
@@ -1063,13 +708,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         // if (gemDigis_->digisInDetId(id).size() == 0) cout  << "!!!! digisInDetId is empty while there are " << detidsDigi.size() << " detIds"<< endl;
         for (auto gemdigi : gemDigis_->digisInDetId(id) ){
           auto gp = gemDigis_->getGlobalPointDigi(id, gemdigi);
-          m_matchGemDigi_phi->push_back(gp.phi());
-          m_matchGemDigi_eta->push_back(gp.eta());
-          m_matchGemDigi_z->push_back(gp.z());
-          m_matchGemDigi_r->push_back(gp.perp());
-          m_matchGemDigi_detId->push_back(id);
-          m_matchGemDigi_strip->push_back(gemdigi.strip());
-          m_matchGemDigi_matchTp->push_back(tp_index);
+          matchGemDigi->FillGP(gp);
+          matchGemDigi->FillGEM(gemdigi,id,tp_index);
         }
       }
     } // End of Muon Loop
@@ -1154,31 +794,18 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
       if (DebugMode) cout << " Started "<< digi_index << "th Digi for "<< allCscStubs_index << "th allCscStubsLCTs" <<endl;
       auto gp = match->cscStubs()->getGlobalPosition(detid.rawId(), *itdigi);
-      m_allCscStubsLCT_phi->push_back(gp.phi());
-      m_allCscStubsLCT_eta->push_back(gp.eta());
-      m_allCscStubsLCT_z->push_back(gp.z());
-      m_allCscStubsLCT_r->push_back(gp.perp());
-      m_allCscStubsLCT_bend->push_back((*itdigi).getBend());
-      m_allCscStubsLCT_pattern->push_back((*itdigi).getRun3Pattern());
-      m_allCscStubsLCT_slope->push_back((*itdigi).getSlope());
-      m_allCscStubsLCT_quality->push_back((*itdigi).getQuality());
-      m_allCscStubsLCT_detId->push_back(detid.rawId());
-      m_allCscStubsLCT_keywire->push_back((*itdigi).getKeyWG());
-      m_allCscStubsLCT_strip->push_back((*itdigi).getStrip());
-      m_allCscStubsLCT_strip8->push_back((*itdigi).getFractionalStrip(8));
-      m_allCscStubsLCT_valid->push_back((*itdigi).isValid());
-      m_allCscStubsLCT_type->push_back((*itdigi).getType());
+      allCscStubsLCT->FillGP(gp);
+      allCscStubsLCT->FillLCT(*itdigi,detid.rawId());
       // allCscStubsALCTs
       if (DebugMode) cout << " Started allCSCStubsALCT"<< endl;
       const auto& alctDigi = (*itdigi).getALCT();
       std::vector< std::vector<unsigned short> > alcthits = alctDigi.getHits();
       if (doprinta) cout << "For allCscStubsALCTs; DetId: "<< detid.rawId() <<", Digi Index: " << digi_index << ", keywire: "<< alctDigi.getKeyWG()<<" , lctDigiWire = "<<(*itdigi).getKeyWG() << endl;
       if (alctDigi.getKeyWG() != (*itdigi).getKeyWG() && doprinta) cout << "Inconsistence keywire: alctDigiWire = "<< alctDigi.getKeyWG() <<" , lctDigiWire = "<<(*itdigi).getKeyWG()<<endl;
-      int alctmultihit = SaveHitMatrix(alcthits, m_allCscStubsALCT_hit, m_allCscStubsALCT_position,doprinta,false);
+      // int alctmultihit = SaveHitMatrix(alcthits, m_allCscStubsALCT_hit, m_allCscStubsALCT_position,doprinta,false);
+      int alctmultihit = SaveHitMatrix(alcthits, allCscStubsALCT->hit, allCscStubsALCT->position,doprinta,false);
       if (doprinta && alctmultihit) cout << "ALCT Multihit found for allCscStubsALCT" << endl;
-      m_allCscStubsALCT_detId->push_back(detid.rawId());
-      m_allCscStubsALCT_keywire->push_back(alctDigi.getKeyWG());
-      m_allCscStubsALCT_valid->push_back(alctDigi.isValid());
+      allCscStubsALCT->FillALCT(alctDigi,detid.rawId());
 
       // allCscStubsCLCTs
       if (DebugMode) cout << " Started allCSCStubsCLCT"<< endl;
@@ -1186,15 +813,10 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       std::vector< std::vector<unsigned short> > clcthits = clctDigi.getHits();
       if (doprintc) cout << "For allCscStubsCLCTs; DetId: "<< detid.rawId() <<", Digi Index:" << digi_index << ", strip: "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< (*itdigi).getStrip()<<endl;
       if (clctDigi.getStrip() != (*itdigi).getStrip() && doprintc) cout << "Inconsistence strip: clctDigiStrip = "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< (*itdigi).getStrip() <<endl;
-      int clctmultihit = SaveHitMatrix(clcthits, m_allCscStubsCLCT_hit, m_allCscStubsCLCT_position,doprintc,true);
+      // int clctmultihit = SaveHitMatrix(clcthits, m_allCscStubsCLCT_hit, m_allCscStubsCLCT_position,doprintc,true);
+      int clctmultihit = SaveHitMatrix(clcthits, allCscStubsCLCT->hit, allCscStubsCLCT->position,doprintc,true);
       if (doprintc && clctmultihit) cout << "CLCT Multihit found for allCscStubsCLCT" << endl;
-      m_allCscStubsCLCT_detId->push_back(detid.rawId());
-      m_allCscStubsCLCT_strip->push_back(clctDigi.getStrip());
-      m_allCscStubsCLCT_strip8->push_back(clctDigi.getFractionalStrip(8));
-      m_allCscStubsCLCT_valid->push_back(clctDigi.isValid());
-      m_allCscStubsCLCT_bend->push_back(clctDigi.getBend());
-      m_allCscStubsCLCT_pattern->push_back(clctDigi.getRun3Pattern());
-      m_allCscStubsCLCT_slope->push_back(clctDigi.getSlope());
+      allCscStubsCLCT->FillCLCT(clctDigi,detid.rawId());
 
       ++digi_index;
     }
@@ -1215,12 +837,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
       std::vector< std::vector<unsigned short> > alcthits = ((*itdigi).getHits());
       if (Print_all && Print_ALCT) cout << "For allALCTs; DetId: "<< detid.rawId() <<", Digi Index:" << digi_index << ", keywire: "<< (*itdigi).getKeyWG()<< endl;
-      int alctmultihit = SaveHitMatrix(alcthits, m_allALCT_hit, m_allALCT_position,Print_all&&Print_ALCT,false);
+      // int alctmultihit = SaveHitMatrix(alcthits, m_allALCT_hit, m_allALCT_position,Print_all&&Print_ALCT,false);
+      int alctmultihit = SaveHitMatrix(alcthits, allALCT->hit, allALCT->position,Print_all&&Print_ALCT,false);
       if (alctmultihit) multihit = true;
       if (Print_all && Print_ALCT && alctmultihit) cout << "ALCT Multihit found for allALCT" << endl;
-      m_allALCT_detId->push_back(detid.rawId());
-      m_allALCT_keywire->push_back((*itdigi).getKeyWG());
-      m_allALCT_valid->push_back((*itdigi).isValid());
+      allALCT->FillALCT(*itdigi,detid.rawId());
       ++digi_index;
     }
   }
@@ -1237,16 +858,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
       std::vector< std::vector<unsigned short> > clcthits = ((*itdigi).getHits());
       if (Print_all && Print_CLCT) cout << "For allCLCTs; DetId: "<< detid.rawId() <<", Digi Index:" << digi_index<< ", strip: "<< (*itdigi).getStrip() << endl;
-      int clctmultihit = SaveHitMatrix(clcthits, m_allCLCT_hit, m_allCLCT_position,Print_all&&Print_CLCT,true);
+      // int clctmultihit = SaveHitMatrix(clcthits, m_allCLCT_hit, m_allCLCT_position,Print_all&&Print_CLCT,true);
+      int clctmultihit = SaveHitMatrix(clcthits, allCLCT->hit, allCLCT->position,Print_all&&Print_CLCT,true);
       if (clctmultihit) multihit = true;
       if (Print_all && Print_CLCT && clctmultihit) cout << "CLCT Multihit found for allCLCT" << endl;
-      m_allCLCT_detId->push_back(detid.rawId());
-      m_allCLCT_strip->push_back((*itdigi).getStrip());
-      m_allCLCT_strip8->push_back((*itdigi).getFractionalStrip(8));
-      m_allCLCT_valid->push_back((*itdigi).isValid());
-      m_allCLCT_bend->push_back((*itdigi).getBend());
-      m_allCLCT_pattern->push_back((*itdigi).getRun3Pattern());
-      m_allCLCT_slope->push_back((*itdigi).getSlope());
+      allCLCT->FillCLCT(*itdigi,detid.rawId());
       ++digi_index;
     }
   }
@@ -1259,9 +875,6 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (Print_all) PrintHits(0);
   if (Print_allCscStubs) PrintHits(1);
   if (Print_matchCscStubs) PrintHits(2);
-  // PrintHits(0);
-  // PrintHits(1);
-  // PrintHits(2);
 
   if (DebugMode) cout << "Finished allCLCT, started GEMDigis" << endl;
   // All GEMDigis
@@ -1275,12 +888,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       auto gp = match->gemDigis()->getGlobalPointDigi(detid, *itdigi);
       // auto gp2 =  getGlobalPointDigi(detid,*itdigi); // Borrowed position function
       // if (gp.phi() != gp2.phi()) cout << "inconsistent function" <<endl;
-      m_allGemDigi_phi->push_back(gp.phi());
-      m_allGemDigi_eta->push_back(gp.eta());
-      m_allGemDigi_z->push_back(gp.z());
-      m_allGemDigi_r->push_back(gp.perp());
-      m_allGemDigi_detId->push_back(detid.rawId());
-      m_allGemDigi_strip->push_back((*itdigi).strip());
+      allGemDigi->FillGP(gp);
+      allGemDigi->FillGEM(*itdigi,detid.rawId());
     }
   }
 
@@ -1291,9 +900,9 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 
 void NtupleMaker::PrintHits(int iset, int idigi) {
-  vector<vector<int> > SavedallCscStubs{*m_allCscStubsALCT_hit, *m_allCscStubsALCT_position, *m_allCscStubsALCT_detId, *m_allCscStubsALCT_keywire, *m_allCscStubsCLCT_hit, *m_allCscStubsCLCT_position, *m_allCscStubsCLCT_detId, *m_allCscStubsCLCT_strip, *m_allCscStubsLCT_detId, *m_allCscStubsLCT_keywire, *m_allCscStubsLCT_strip};
-  vector<vector<int> > SavedmatchCscStubs{*m_matchCscStubsALCT_hit, *m_matchCscStubsALCT_position, *m_matchCscStubsALCT_detId, *m_matchCscStubsALCT_keywire, *m_matchCscStubsCLCT_hit, *m_matchCscStubsCLCT_position, *m_matchCscStubsCLCT_detId, *m_matchCscStubsCLCT_strip, *m_matchCscStubsLCT_detId, *m_matchCscStubsLCT_keywire, *m_matchCscStubsLCT_strip};
-  vector<vector<int> > Savedall{*m_allALCT_hit, *m_allALCT_position, *m_allALCT_detId, *m_allALCT_keywire, *m_allCLCT_hit, *m_allCLCT_position, *m_allCLCT_detId, *m_allCLCT_strip};
+  vector<vector<int> > SavedallCscStubs{*(allCscStubsALCT->hit), *(allCscStubsALCT->position), *(allCscStubsALCT->detId), *(allCscStubsALCT->keywire), *(allCscStubsCLCT->hit), *(allCscStubsCLCT->position), *(allCscStubsCLCT->detId), *(allCscStubsCLCT->strip), *(allCscStubsLCT->detId), *(allCscStubsLCT->keywire), *(allCscStubsLCT->strip)};
+  vector<vector<int> > SavedmatchCscStubs{*(matchCscStubsALCT->hit), *(matchCscStubsALCT->position), *(matchCscStubsALCT->detId), *(matchCscStubsALCT->keywire), *(matchCscStubsCLCT->hit), *(matchCscStubsCLCT->position), *(matchCscStubsCLCT->detId), *(matchCscStubsCLCT->strip), *(matchCscStubsLCT->detId), *(matchCscStubsLCT->keywire), *(matchCscStubsLCT->strip)};
+  vector<vector<int> > Savedall{*(allALCT->hit), *(allALCT->position), *(allALCT->detId), *(allALCT->keywire), *(allCLCT->hit), *(allCLCT->position), *(allCLCT->detId), *(allCLCT->strip)};
   vector<string> printtitle{"hits","positions","detids","keywires","hits","positions","detids","strips","LCT Digi detids","LCT Digi keywires","LCT Digi strips"};
   vector<vector<int> > printinfo;
   cout <<endl;
@@ -1431,6 +1040,5 @@ GlobalPoint NtupleMaker::getGlobalPointDigi(unsigned int rawId, const GEMDigi& d
   const GlobalPoint& gem_gp = gemGeometry_->idToDet(gem_id)->surface().toGlobal(gem_lp);
   return gem_gp;
 }
-
 
 DEFINE_FWK_MODULE(NtupleMaker);

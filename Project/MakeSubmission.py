@@ -1,13 +1,19 @@
 import os, sys
 
-iteration = "Run4_3/"
+iteration = "Run3/"
 cmssw_ver = "CMSSW_11_2_0_pre9"
-datasets = ["RVSMPt10PU","RVSMPt10noPU","RVSMPt100PU","RVSMPt100noPU","RVSMPt1000PU","RVSMPt1000noPU","RVSMFlatPU","RVSMFlatnoPU"]
-datasets = datasets + ["RVDMPt2PU","RVDMPt2noPU","RVDMPt10PU","RVDMPt10noPU","RVDMPt30PU","RVDMPt30noPU"]
-process = 0
-if not len(sys.argv) == 1:
+maxfile   = 5000
+IsRun4 = False
+if IsRun4:
+  datasets = ["RVSMPt10PU","RVSMPt10noPU","RVSMPt100PU","RVSMPt100noPU","RVSMPt1000PU","RVSMPt1000noPU","RVSMFlatPU","RVSMFlatnoPU"]
+  datasets = datasets + ["RVDMPt2PU","RVDMPt2noPU","RVDMPt10PU","RVDMPt10noPU","RVDMPt30PU","RVDMPt30noPU"]
+else:
+  datasets = ["DY","H9","H15","H30","H100"]
+
+if len(sys.argv) == 1:
+  process = 0
+else:
   process = int(sys.argv[1])
-# datasetsjoined = " ".join(datasets)
 
 eosdir = "/eos/user/s/siluo/Muon/" + iteration
 curdir = os.path.abspath(os.path.curdir)
@@ -40,43 +46,89 @@ if process == 0 or process == 1:
 
 # Make Submission scripts
 if process == 0 or process == 2:
-  with open("SubTemplate.sub") as fin:
-    lines = fin.readlines()
   for ds in datasets:
-    fn = "Submits/"+ds+".sub"
-    f = open(fn,"w")
     nf = len(open(dsdir+iteration+ds+".txt").readlines())
-    writeline = lines
-    writeline[1] = "arguments    = $(Proxy_path) $(ProcID) "+iteration+ds+" 0\n"
-    logline = "logs"+ds+"/log_$(ClusterID)_$(ProcID)"
-    writeline[4] = "output       = " + logline + ".out\n"
-    writeline[5] = "error        = " + logline + ".err\n"
-    writeline[6] = "log          = " + logline + ".log\n"
-    writeline[12] = "queue "+str(nf)
-    f.writelines(writeline)
-    print("Dataset: " + ds + ' submission script created')
+    lines = []
+    lines.append("Proxy_path   = /afs/cern.ch/user/s/siluo/x509up\n")
+    lines.append("arguments    = $(Proxy_path) $(ProcID) "+iteration+ds+" 0\n")
+    lines.append("executable   = MultiSub.sh\n")
+    lines.append("max_retries  = 10\n")
+    lines.append("+JobBatchName= " + iteration+ds +"\n")
+    lines.append("output       = logs"+ds+"/log_$(ClusterID)_$(ProcID).out\n")
+    lines.append("error        = logs"+ds+"/log_$(ClusterID)_$(ProcID).err\n")
+    lines.append("log          = logs"+ds+"/log_$(ClusterID)_$(ProcID).log\n")
+    lines.append("universe     = vanilla\n")
+    lines.append('Requirements = (OpSysAndVer =?= "CentOS7")\n')
+    lines.append('+JobFlavour  = "longlunch"\n')
+    lines.append("RequestCpus  = 2\n")
+    lines.append("periodic_release =  (NumJobStarts < 10) && ((CurrentTime - EnteredCurrentStatus) > (5*60))\n")
+    lines.append("queue "+str(nf)+"\n")
 
+    fn = "Submits/"+ds+".sub"
+    if nf > maxfile:
+      nf = maxfile
+      fn = "Submits/"+ds+"0.sub"
+    f = open(fn,"w")
+    f.writelines(lines)
+    print("Dataset: " + ds + ' submission script created: '+ fn)
+
+# Make executable for job
 if process == 0 or process == 3:
-  with open("MultiSub.sh") as fin:
-    lines = fin.readlines()
+  lines = []
+  lines.append("#!/bin/sh\n")
+  lines.append("export X509_USER_PROXY=$1\n")
+  lines.append("voms-proxy-info -all\n")
+  lines.append("voms-proxy-info -all -file $1\n")
+  lines.append("j=${4:-0}\n")
+  lines.append("i=$(($2+5000*$j))\n")
+  lines.append("\n")
+  lines.append("existname=/eos/user/s/siluo/Muon/${3}/out_${i}.root\n")
+  lines.append("if [ -e $existname ]\n")
+  lines.append("then\n")
+  lines.append("  echo 'File already processed'\n")
+  lines.append("  exit 0\n")
+  lines.append("fi\n")
+  lines.append("\n")
+  lines.append("# dir=$(pwd)\n")
+  lines.append("cd /afs/cern.ch/work/s/siluo/CMSSW/" + cmssw_ver + "/src\n")
+  lines.append("export SCRAM_ARCH=slc7_amd64_gcc700\n")
+  lines.append("eval `scramv1 runtime -sh`\n")
+  lines.append("cd "+curdir+"/\n")
+  lines.append("cmsRun NtuplizeSIM.py ifile=$i dataset=$3\n")
+  lines.append("\n")
+  lines.append("filename=/eos/user/s/siluo/Muon/${3}/InProgress/out_${i}.root\n")
+  lines.append("filesize=$(stat -c %s $filename)\n")
+  lines.append("if [ $filesize -gt 1000 ]\n")
+  lines.append("then\n")
+  lines.append("  mv $filename $existname\n")
+  lines.append("  echo 'Job is done...'\n")
+  lines.append("else\n")
+  lines.append("  rm $filename\n")
+  lines.append('  echo "Job failed...Output filesize $filesize. Now retrying......"\n')
+  lines.append("  exit 1\n")
+  lines.append("fi\n")
+
   fn = "Submits/MultiSub.sh"
   f = open(fn,"w")
-  lines[15] = "cd /afs/cern.ch/work/s/siluo/CMSSW/" + cmssw_ver + "/src\n"
-  lines[18] = "cd "+curdir+"/\n"
   f.writelines(lines)
   mode = "755"
   os.chmod(fn,int(mode,base=8));
+  print('Executable shell script created: '+ fn)
 
 if process == 0 or process == 4:
   lines = []
   lines.append("#!/bin/sh\n")
+  lines.append('voms-proxy-init --rfc --voms cms -valid 192:00 -out ${HOME}/x509up\n')
+  lines.append('export X509_USER_PROXY=${HOME}/x509up\n')
   lines.append("for i in $(ls *.sub)\n")
   lines.append("do\n")
   lines.append("  echo Submitting $i\n")
-  lines.append("  condor_submit $i\n")
+  lines.append("  condor_submit $i -batch-name $i\n")
   lines.append("done")
+
   fn = "Submits/Submission.sh"
   f = open(fn,"w")
   f.writelines(lines)
   mode = "755"
   os.chmod(fn,int(mode,base=8));
+  print('Submitting shell script created: '+ fn)

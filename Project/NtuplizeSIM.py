@@ -19,6 +19,8 @@ options.register('dataset', "Run4/RVSMPt10noPU", VarParsing.VarParsing.multiplic
 options.parseArguments()
 ifile = options.ifile
 datatag = options.dataset
+IsRun4 = False
+IsTestRun = True
 # print("process number: ", ifile)
 print("Processing {}th file of dataset {}.".format(ifile,datatag))
 
@@ -36,27 +38,34 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-# process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
+if IsRun4:
+    process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
+    process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
+else:
+    process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+if not IsTestRun:
+    process.MessageLogger.cerr.FwkReport.reportEvery = 100
+
+# process.MessageLogger.suppressWarning = cms.untracked.vstring('GEMRawToDigiModule')
+process.MessageLogger.suppressWarning = cms.untracked.vstring("muonGEMDigis")
+# process.MessageLogger.cerr.threshold = cms.untracked.string('ERROR')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1),
-    # input = cms.untracked.int32(100),
+    # input = cms.untracked.int32(-1),
+    input = cms.untracked.int32(100 if IsTestRun else -1),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(inputFile),
-    # fileNames = cms.untracked.vstring('file:step1.root'),
+    # fileNames = cms.untracked.vstring(inputFile),
+    fileNames = cms.untracked.vstring('file:step1.root' if IsTestRun else inputFile),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -127,9 +136,11 @@ process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
 process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
 
 # NtupleMaker
-process.TFileService = cms.Service("TFileService", fileName = cms.string('/eos/user/s/siluo/Muon/'+datatag+'/InProgress/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
+outputname = 'out/out.root' if IsTestRun else '/eos/user/s/siluo/Muon/'+datatag+'/InProgress/out_'+str(ifile)+'.root'
+# process.TFileService = cms.Service("TFileService", fileName = cms.string('/eos/user/s/siluo/Muon/'+datatag+'/InProgress/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
 # process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out.root'), closeFileFast = cms.untracked.bool(True))
 # process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
+process.TFileService = cms.Service("TFileService", fileName = cms.string(outputname), closeFileFast = cms.untracked.bool(True))
 
 from GEMCode.GEMValidation.simTrackMatching_cfi import simTrackPSet
 process.NtupleMaker = cms.EDAnalyzer('NtupleMaker',
@@ -142,6 +153,7 @@ process.NtupleMaker = cms.EDAnalyzer('NtupleMaker',
                                        TP_minPt = cms.double(2.0),       # only save TPs with pt > X GeV
                                        TP_maxEta = cms.double(2.5),      # only save TPs with |eta| < X
                                        TP_maxZ0 = cms.double(30000.0),      # only save TPs with |z0| < X cm
+                                       IsRun4 = cms.bool(IsRun4),
                                        Print_matchCscStubs = cms.bool(False),
                                        Print_allCscStubs = cms.bool(False),
                                        Print_all = cms.bool(False),
@@ -173,7 +185,7 @@ ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
 ana.gemStripDigi = cms.PSet(
     verbose = cms.int32(0),
     # inputTag = cms.InputTag("muonGEMDigis"),
-    inputTag = cms.InputTag("simMuonGEMDigis"),
+    inputTag = cms.InputTag("simMuonGEMDigis" if IsRun4 else "muonGEMDigis"),
     minBX = cms.int32(-1),
     maxBX = cms.int32(1),
     matchDeltaStrip = cms.int32(1),

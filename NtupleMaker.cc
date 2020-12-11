@@ -131,6 +131,7 @@ private:
   double TP_minPt;
   double TP_maxEta;
   double TP_maxZ0;
+  bool IsRun4;
   bool Print_matchCscStubs;
   bool Print_allCscStubs;
   bool Print_all;
@@ -236,6 +237,7 @@ config(iConfig)
   TP_minPt         = iConfig.getParameter< double >("TP_minPt");
   TP_maxEta        = iConfig.getParameter< double >("TP_maxEta");
   TP_maxZ0         = iConfig.getParameter< double >("TP_maxZ0");
+  IsRun4           = iConfig.getParameter< bool >("IsRun4");
   Print_matchCscStubs = iConfig.getParameter< bool >("Print_matchCscStubs");
   Print_allCscStubs   = iConfig.getParameter< bool >("Print_allCscStubs");
   Print_all         = iConfig.getParameter< bool >("Print_all");
@@ -248,8 +250,8 @@ config(iConfig)
   m_emtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simEmtfDigis","EMTF"));
   // m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("gmtStage2Digis","BMTF"));
   // m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("gmtStage2Digis","OMTF"));
-  m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simBmtfDigis","BMTF"));
-  m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simOmtfDigis","OMTF"));
+  m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag(IsRun4 ? "simBmtfDigis": "gmtStage2Digis","BMTF"));
+  m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag(IsRun4 ? "simOmtfDigis": "gmtStage2Digis","OMTF"));
 
   const auto& simVertex = iConfig.getParameter<edm::ParameterSet>("simVertex");
   simVertexInput_ = consumes<edm::SimVertexContainer>(simVertex.getParameter<edm::InputTag>("inputTag"));

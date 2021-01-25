@@ -673,6 +673,9 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         for (auto digi_ : cscStubs->lctsInChamber(detid_) ){
           if (DebugMode) cout << "" << endl;
           auto gp = cscStubs->getGlobalPosition(detid_int,digi_);
+          auto gp2 = cscStubs->getGlobalPosition2(detid_int,digi_);
+          cout << endl << "GlobalPoint before change: eta = " << gp2.eta()<< " , phi = " << gp2.phi() << endl;
+          cout         << "GlobalPoint after  change: eta = " << gp.eta() << " , phi = " << gp.phi()  << endl;
           matchCscStubsLCT->FillGP(gp);
           matchCscStubsLCT->FillLCT(digi_,detid_.rawId(),tp_index);
           if (Print_matchCscStubs) cout << "detid_int = " <<detid_int<<", detid = " << int(detid_) << ", rawId = " << detid_.rawId() << endl;

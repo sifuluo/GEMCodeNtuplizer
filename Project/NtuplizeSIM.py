@@ -15,14 +15,25 @@ process = cms.Process('ReL1',Run3)
 
 options = VarParsing.VarParsing ('standard')
 options.register('ifile', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "input file index")
-options.register('dataset', "Run4/RVSMPt10noPU", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "input dataset name")
+options.register('dataset', "Run4/RVSMPt1000noPU", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "input dataset name")
+options.register('outputtag', "ME1/RVSMPt1000noPU", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "output folder name")
 options.parseArguments()
 ifile = options.ifile
 datatag = options.dataset
-IsRun4 = False
-IsTestRun = True
+outputtag = options.outputtag
+IsRun4 = True
+
+IsLocal = False
+IsFullRun = True
+if ifile < 0:
+    IsLocal = True
+if ifile == -1:
+    IsFullRun = False
+# ifile: >=0 number of file to process. -1: process 100 event local file. -2: process all local file.
 # print("process number: ", ifile)
-print("Processing {}th file of dataset {}.".format(ifile,datatag))
+if ifile >=  0: print("Processing {}th file of dataset {}.".format(ifile,datatag))
+if ifile == -1: print("Testing 100 events of step1.root")
+if ifile == -2: print("Testing all events of step1.root")
 
 inputFile = ""
 with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
@@ -49,23 +60,23 @@ process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-if not IsTestRun:
+if not IsLocal:
     process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 # process.MessageLogger.suppressWarning = cms.untracked.vstring('GEMRawToDigiModule')
-process.MessageLogger.suppressWarning = cms.untracked.vstring("muonGEMDigis")
+process.MessageLogger.suppressWarning = cms.untracked.vstring("muonGEMDigis","simEmtfDigis")
 # process.MessageLogger.cerr.threshold = cms.untracked.string('ERROR')
 
 process.maxEvents = cms.untracked.PSet(
     # input = cms.untracked.int32(-1),
-    input = cms.untracked.int32(100 if IsTestRun else -1),
+    input = cms.untracked.int32(100 if not IsFullRun else -1),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     # fileNames = cms.untracked.vstring(inputFile),
-    fileNames = cms.untracked.vstring('file:step1.root' if IsTestRun else inputFile),
+    fileNames = cms.untracked.vstring('file:step1.root' if IsLocal else inputFile),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -136,7 +147,7 @@ process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
 process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
 
 # NtupleMaker
-outputname = 'out/out.root' if IsTestRun else '/eos/user/s/siluo/Muon/'+datatag+'/InProgress/out_'+str(ifile)+'.root'
+outputname = 'out/out.root' if IsLocal else '/eos/user/s/siluo/Muon/'+outputtag+'/InProgress/out_'+str(ifile)+'.root'
 # process.TFileService = cms.Service("TFileService", fileName = cms.string('/eos/user/s/siluo/Muon/'+datatag+'/InProgress/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
 # process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out.root'), closeFileFast = cms.untracked.bool(True))
 # process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))

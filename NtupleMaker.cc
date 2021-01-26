@@ -673,9 +673,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         for (auto digi_ : cscStubs->lctsInChamber(detid_) ){
           if (DebugMode) cout << "" << endl;
           auto gp = cscStubs->getGlobalPosition(detid_int,digi_);
-          auto gp2 = cscStubs->getGlobalPosition2(detid_int,digi_);
-          cout << endl << "matched CscStubsLCT GlobalPoint before change: eta = " << gp2.eta()<< " , phi = " << gp2.phi() << endl;
-          cout         << "matched CscStubsLCT GlobalPoint after  change: eta = " << gp.eta() << " , phi = " << gp.phi()  << endl;
+          // auto gp2 = cscStubs->getGlobalPosition2(detid_int,digi_);
+          // if (gp2.eta() != gp.eta() || gp2.phi() != gp.phi()) {
+          //   cout << endl << "matched CscStubsLCT GlobalPoint before change: eta = " << gp2.eta()<< " , phi = " << gp2.phi() << endl;
+          //   cout         << "matched CscStubsLCT GlobalPoint after  change: eta = " << gp.eta() << " , phi = " << gp.phi()  << endl;
+          // }
           matchCscStubsLCT->FillGP(gp);
           matchCscStubsLCT->FillLCT(digi_,detid_.rawId(),tp_index);
           if (Print_matchCscStubs) cout << "detid_int = " <<detid_int<<", detid = " << int(detid_) << ", rawId = " << detid_.rawId() << endl;
@@ -799,9 +801,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
       if (DebugMode) cout << " Started "<< digi_index << "th Digi for "<< allCscStubs_index << "th allCscStubsLCTs" <<endl;
       auto gp = match->cscStubs()->getGlobalPosition(detid.rawId(), *itdigi);
-      auto gp2 = match->cscStubs()->getGlobalPosition2(detid.rawId(), *itdigi);
-      cout << endl << "all CscStubsLCT GlobalPoint before change: eta = " << gp2.eta()<< " , phi = " << gp2.phi() << endl;
-      cout         << "all CscStubsLCT GlobalPoint after  change: eta = " << gp.eta() << " , phi = " << gp.phi()  << endl;
+      // auto gp2 = match->cscStubs()->getGlobalPosition2(detid.rawId(), *itdigi);
+      // if (gp2.eta() != gp.eta() || gp2.phi() != gp.phi()) {
+      //   cout << endl << "all CscStubsLCT GlobalPoint before change: eta = " << gp2.eta()<< " , phi = " << gp2.phi() << endl;
+      //   cout         << "all CscStubsLCT GlobalPoint after  change: eta = " << gp.eta() << " , phi = " << gp.phi()  << endl;
+      // }
       allCscStubsLCT->FillGP(gp);
       allCscStubsLCT->FillLCT(*itdigi,detid.rawId());
       // allCscStubsALCTs

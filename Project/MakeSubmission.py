@@ -1,7 +1,8 @@
 import os, sys
 
-iteration = "Run3/"
-cmssw_ver = "CMSSW_11_2_0_pre9"
+iteration = "Run4/"
+eositeration = "ME1/"
+cmssw_ver = "CMSSW_11_2_0"
 maxfile   = 5000
 IsRun4 = False
 if IsRun4:
@@ -10,12 +11,14 @@ if IsRun4:
 else:
   datasets = ["DY","H9","H15","H30","H100"]
 
+datasets = ["RVSMPt1000noPU"]
+
 if len(sys.argv) == 1:
   process = 0
 else:
   process = int(sys.argv[1])
 
-eosdir = "/eos/user/s/siluo/Muon/" + iteration
+eosdir = "/eos/user/s/siluo/Muon/" + eositeration
 curdir = os.path.abspath(os.path.curdir)
 subdir = os.path.join(curdir,"Submits")
 dsdir = "/afs/cern.ch/work/s/siluo/Muon/filenames/"
@@ -42,7 +45,7 @@ if process == 0 or process == 1:
     else: print( '  Existed: ' + ds + ' WIP directory' + mkeosinprogressdir)
 
     print('Dataset: ' + ds + ' finished creating directories')
-  print('Iteration: ' + iteration + ' finished creating directories')
+  print('Iteration: ' + eositeration + ' finished creating directories')
 
 # Make Submission scripts
 if process == 0 or process == 2:
@@ -50,7 +53,7 @@ if process == 0 or process == 2:
     nf = len(open(dsdir+iteration+ds+".txt").readlines())
     lines = []
     lines.append("Proxy_path   = /afs/cern.ch/user/s/siluo/x509up\n")
-    lines.append("arguments    = $(Proxy_path) $(ProcID) "+iteration+ds+" 0\n")
+    lines.append("arguments    = $(Proxy_path) $(ProcID) "+iteration+ds+" 0 "+eositeration+ds+"\n")
     lines.append("executable   = MultiSub.sh\n")
     lines.append("max_retries  = 10\n")
     lines.append("+JobBatchName= " + iteration+ds +"\n")
@@ -66,8 +69,8 @@ if process == 0 or process == 2:
 
     fn = "Submits/"+ds+".sub"
     if nf > maxfile:
-      nf = maxfile
       fn = "Submits/"+ds+"0.sub"
+      lines[13] = "queue "+str(maxfile)+"\n"
     f = open(fn,"w")
     f.writelines(lines)
     print("Dataset: " + ds + ' submission script created: '+ fn)
@@ -94,7 +97,7 @@ if process == 0 or process == 3:
   lines.append("export SCRAM_ARCH=slc7_amd64_gcc700\n")
   lines.append("eval `scramv1 runtime -sh`\n")
   lines.append("cd "+curdir+"/\n")
-  lines.append("cmsRun NtuplizeSIM.py ifile=$i dataset=$3\n")
+  lines.append("cmsRun NtuplizeSIM.py ifile=$i dataset=$3 outputtag=$5\n")
   lines.append("\n")
   lines.append("filename=/eos/user/s/siluo/Muon/${3}/InProgress/out_${i}.root\n")
   lines.append("filesize=$(stat -c %s $filename)\n")

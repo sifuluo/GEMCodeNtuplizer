@@ -133,8 +133,8 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '
 from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
 process = addCSCTriggerRun3(process)
 
-from GEMCode.GEMValidation.cscTriggerCustoms import runOn120XMC
-process = runOn120XMC(process)
+from GEMCode.GEMValidation.cscTriggerCustoms import runOn110XMC
+process = runOn110XMC(process)
 
 # customize unpacker
 # if IsRun4:
@@ -215,7 +215,7 @@ ana.gemStripDigi = cms.PSet(
     matchDeltaStrip = cms.int32(1),
     matchToSimLink = cms.bool(False)
 )
-ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisRun3ILT","")
+# ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisRun3ILT","")
 process.ana = cms.Path(ana)
 
 

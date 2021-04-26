@@ -12,13 +12,9 @@ import sys
 import FWCore.ParameterSet.VarParsing as VarParsing
 
 process = cms.Process('REPR',Run3)
-# process = cms.Process('REPR',eras.Phase2C9)
-#process = cms.Process('REPR',eras.Phase2C4_timing_layer_bar)
-
-
 
 options = VarParsing.VarParsing ('standard')
-options.register('ifile', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "input file name")
+options.register('ifile', -1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "input file name")
 options.parseArguments()
 ifile = options.ifile
 print("process number: ", ifile)
@@ -34,6 +30,7 @@ with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/Run4/RVSMPt10noPU.txt")
             break
 inputFile = inputFile.strip('\n')
 
+IsRun4 = False
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -41,11 +38,11 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-# process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
-# process.load('Configuration.Geometry.GeometryExtended2026D41Reco_cff')
-# process.load('Configuration.Geometry.GeometryExtended2026D41_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
+if IsRun4:
+    process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
+    process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
+else:
+    process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 
@@ -119,12 +116,14 @@ process.NtupleMaker = cms.EDAnalyzer('NtupleMaker',
                                        TP_minPt = cms.double(2.0),       # only save TPs with pt > X GeV
                                        TP_maxEta = cms.double(2.5),      # only save TPs with |eta| < X
                                        TP_maxZ0 = cms.double(30000.0),      # only save TPs with |z0| < X cm
+                                       IsRun4 = cms.bool(IsRun4),
                                        Print_matchCscStubs = cms.bool(False),
                                        Print_allCscStubs = cms.bool(False),
                                        Print_all = cms.bool(False),
                                        Print_ALCT = cms.bool(False),
                                        Print_CLCT = cms.bool(False),
                                        TrackingParticleInputTag = cms.InputTag("mix", "MergedTrackTruth"),
+                                       useGEMs = cms.bool(True),
                                        )
 ana = process.NtupleMaker
 ana.simTrack.minEta = 1.2
@@ -146,18 +145,17 @@ ana.cscCLCT.minBX = 6
 ana.cscCLCT.maxBX = 8
 ana.cscLCT.verbose = 0
 ana.cscLCT.addGhostLCTs = cms.bool(True)
-# ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
-# ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
-# ana.gemStripDigi.inputTag = cms.InputTag("muonGEMDigis")
+ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
 ana.gemStripDigi = cms.PSet(
     verbose = cms.int32(0),
     # inputTag = cms.InputTag("muonGEMDigis"),
-    inputTag = cms.InputTag("simMuonGEMDigis"),
+    inputTag = cms.InputTag("simMuonGEMDigis" if IsRun4 else "muonGEMDigis"),
     minBX = cms.int32(-1),
     maxBX = cms.int32(1),
     matchDeltaStrip = cms.int32(1),
     matchToSimLink = cms.bool(False)
 )
+ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
 process.ana = cms.Path(ana)
 
 process.endjob_step = cms.EndPath(process.endOfProcess)

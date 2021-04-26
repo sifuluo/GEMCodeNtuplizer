@@ -14,14 +14,14 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 process = cms.Process('ReL1',Run3)
 
 options = VarParsing.VarParsing ('standard')
-options.register('ifile', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "input file index")
+options.register('ifile', -1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "input file index")
 options.register('dataset', "Run4/RVSMPt1000noPU", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "input dataset name")
 options.register('outputtag', "ME1/RVSMPt1000noPU", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "output folder name")
 options.parseArguments()
 ifile = options.ifile
 datatag = options.dataset
 outputtag = options.outputtag
-IsRun4 = True
+IsRun4 = False
 
 IsLocal = False
 IsFullRun = True
@@ -32,8 +32,8 @@ if ifile == -1:
 # ifile: >=0 number of file to process. -1: process 100 event local file. -2: process all local file.
 # print("process number: ", ifile)
 if ifile >=  0: print("Processing {}th file of dataset {}.".format(ifile,datatag))
-if ifile == -1: print("Testing 100 events of step1.root")
-if ifile == -2: print("Testing all events of step1.root")
+if ifile == -1: print("Testing 100 events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
+if ifile == -2: print("Testing all events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
 
 inputFile = ""
 with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
@@ -76,7 +76,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     # fileNames = cms.untracked.vstring(inputFile),
-    fileNames = cms.untracked.vstring('file:step1.root' if IsLocal else inputFile),
+    fileNames = cms.untracked.vstring(('file:step1' + ('Run4' if IsRun4 else 'Run3') + '.root') if IsLocal else inputFile),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -133,16 +133,28 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '
 from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
 process = addCSCTriggerRun3(process)
 
-# customize unpacker
-process.muonGEMDigis.useDBEMap = False
+from GEMCode.GEMValidation.cscTriggerCustoms import runOn120XMC
+process = runOn120XMC(process)
 
-process.SimL1Emulator = cms.Sequence(
-    process.simMuonGEMPadDigis *
-    process.simMuonGEMPadDigiClusters *
-    process.simCscTriggerPrimitiveDigis *
-    process.simCscTriggerPrimitiveDigisRun3CCLUT *
-    process.simEmtfDigis)
-process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
+# customize unpacker
+# if IsRun4:
+#     process.muonGEMDigis.useDBEMap = False
+# else:
+#     # Work around for GEM in Run3 samples
+#     process.GlobalTag.toGet = cms.VPSet(
+#     cms.PSet(record = cms.string("GEMeMapRcd"),
+#     tag = cms.string("GEMeMapDummy"),
+#     connect = cms.string("sqlite_file:GEMeMapDummy.db")))
+#     process.muonGEMDigis.useDBEMap = True
+# This part has been incorporated in runOn120XMC()
+
+# process.SimL1Emulator = cms.Sequence(
+#     process.simMuonGEMPadDigis *
+#     process.simMuonGEMPadDigiClusters *
+#     process.simCscTriggerPrimitiveDigis *
+#     process.simCscTriggerPrimitiveDigisRun3CCLUT *
+#     process.simEmtfDigis)
+# process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
 
 process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
 
@@ -171,6 +183,7 @@ process.NtupleMaker = cms.EDAnalyzer('NtupleMaker',
                                        Print_ALCT = cms.bool(False),
                                        Print_CLCT = cms.bool(False),
                                        TrackingParticleInputTag = cms.InputTag("mix", "MergedTrackTruth"),
+                                       useGEMs = cms.bool(True),
                                        )
 ana = process.NtupleMaker
 ana.simTrack.minEta = 1.2
@@ -178,7 +191,7 @@ ana.simTrack.maxEta = 2.4
 ana.simTrack.minPt = 3
 ana.gemSimHit.verbose = 0
 # ana.gemStripDigi.verbose = 0
-# ana.gemStripDigi.matchDeltaStrip = 2
+ana.gemStripDigi.matchDeltaStrip = 2
 ana.gemPadDigi.verbose = 0
 ana.gemCoPadDigi.verbose = 0
 ana.gemPadCluster.verbose = 0
@@ -202,17 +215,22 @@ ana.gemStripDigi = cms.PSet(
     matchDeltaStrip = cms.int32(1),
     matchToSimLink = cms.bool(False)
 )
+ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisRun3ILT","")
 process.ana = cms.Path(ana)
 
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
+process.muonGEMDigis_step = cms.Path(process.muonGEMDigis)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 # process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
+if IsRun4:
+    process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
+else:
+    process.schedule = cms.Schedule(process.raw2digi_step,process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
 # process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step,process.FEVTDEBUGoutput_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)

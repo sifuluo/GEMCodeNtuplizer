@@ -4,8 +4,12 @@
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v
 # with command line options: step2bis.py --filein file:step3.root --fileout file:step2bis.root --mc --eventcontent FEVTDEBUG --datatier GEN-SIM-DIGI-L1 --conditions auto:phase1_2021_realistic --step L1 --geometry DB:Extended --era Run3 --python_filename step2bis_L1.py --no_exec -n 10
 import FWCore.ParameterSet.Config as cms
-
+from FWCore.ParameterSet.VarParsing import VarParsing
 from Configuration.Eras.Era_Run3_cff import Run3
+
+options = VarParsing('analysis')
+options.register ("test", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
+options.parseArguments()
 
 process = cms.Process('ReL1',Run3)
 
@@ -15,24 +19,27 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-# process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
+process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
+nEvents = -1
+if options.test:
+    nEvents = 100
+
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100),
+    input = cms.untracked.int32(nEvents),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:step1.root'),
-    # fileNames = cms.untracked.vstring('/store/relval/CMSSW_11_2_0_pre6/RelValSingleMuPt10/GEN-SIM-DIGI-RAW/112X_mcRun3_2021_realistic_v7-v1/20000/E1618E93-DB80-2D40-88C5-0077AB6C200C.root'),
+    fileNames = cms.untracked.vstring(
+        'file:step1Run3.root'
+    ),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -78,14 +85,13 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     fileName = cms.untracked.string('file:step2bis_run3.root'),
-    # fileName = cms.untracked.string('out/out_'+str(ifile)+'.root'),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
 
 ## keep all CSC trigger versions
 process.FEVTDEBUGoutput.outputCommands.append('keep *_simCscTriggerPrimitiveDigis*_*_*')
-process.FEVTDEBUGoutput.outputCommands.append('keep *_simEmtfDigis_*_*')
+process.FEVTDEBUGoutput.outputCommands.append('keep *_simEmtfDigis*_*_*')
 
 ## drop all calorimetry, tracker and raw
 process.FEVTDEBUGoutput.outputCommands.append('drop *_simHcal*_*_*')
@@ -104,26 +110,24 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '
 from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
 process = addCSCTriggerRun3(process)
 
-## customize unpacker
-process.muonGEMDigis.useDBEMap = False
-
-process.SimL1Emulator = cms.Sequence(
-    process.simMuonGEMPadDigis *
-    process.simMuonGEMPadDigiClusters *
-    process.simCscTriggerPrimitiveDigis *
-    process.simCscTriggerPrimitiveDigisRun3CCLUT *
-    process.simEmtfDigis)
-process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
+from GEMCode.GEMValidation.cscTriggerCustoms import runOn110XMC
+process = runOn110XMC(process)
 
 # Path and EndPath definitions
-process.raw2digi_step = cms.Path(process.RawToDigi)
+process.raw2digi_step = cms.Path(process.muonGEMDigis)
+process.raw2digi_step2 = cms.Path(process.RawToDigi)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.endjob_step,process.FEVTDEBUGoutput_step)
-# process.schedule = cms.Schedule(process.L1simulation_step,process.endjob_step,process.FEVTDEBUGoutput_step)
+process.schedule = cms.Schedule(
+    process.raw2digi_step2,
+    process.raw2digi_step,
+    process.L1simulation_step,
+    process.endjob_step,
+    process.FEVTDEBUGoutput_step
+)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 

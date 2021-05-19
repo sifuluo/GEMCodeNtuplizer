@@ -147,8 +147,8 @@ private:
   std::string getGlobalPhi(const l1t::RegionalMuonCand& l1mu) const;
 
   edm::EDGetToken m_emtfToken;
-  edm::EDGetToken m_bmtfToken;
-  edm::EDGetToken m_omtfToken;
+  // edm::EDGetToken m_bmtfToken;
+  // edm::EDGetToken m_omtfToken;
 
   edm::EDGetTokenT< std::vector< TrackingParticle > > TrackingParticleToken_;
   edm::EDGetTokenT<edm::SimVertexContainer> simVertexInput_;
@@ -184,17 +184,17 @@ private:
   std::vector<float>* m_EMTF_muon_phi;
   std::vector<int>*   m_EMTF_muon_c;
 
-  std::vector<int>*   m_OMTF_muon_n;
-  std::vector<float>* m_OMTF_muon_pt;
-  std::vector<float>* m_OMTF_muon_eta;
-  std::vector<float>* m_OMTF_muon_phi;
-  std::vector<int>*   m_OMTF_muon_c;
-
-  std::vector<int>*   m_BMTF_muon_n;
-  std::vector<float>* m_BMTF_muon_pt;
-  std::vector<float>* m_BMTF_muon_eta;
-  std::vector<float>* m_BMTF_muon_phi;
-  std::vector<int>*   m_BMTF_muon_c;
+  // std::vector<int>*   m_OMTF_muon_n;
+  // std::vector<float>* m_OMTF_muon_pt;
+  // std::vector<float>* m_OMTF_muon_eta;
+  // std::vector<float>* m_OMTF_muon_phi;
+  // std::vector<int>*   m_OMTF_muon_c;
+  //
+  // std::vector<int>*   m_BMTF_muon_n;
+  // std::vector<float>* m_BMTF_muon_pt;
+  // std::vector<float>* m_BMTF_muon_eta;
+  // std::vector<float>* m_BMTF_muon_phi;
+  // std::vector<int>*   m_BMTF_muon_c;
 
   std::vector<float>* m_cscSimHit_phi;
   std::vector<float>* m_cscSimHit_eta;
@@ -250,8 +250,8 @@ config(iConfig)
   TrackingParticleToken_ = consumes< std::vector< TrackingParticle > >(TrackingParticleInputTag);
 
   m_emtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simEmtfDigis","EMTF"));
-  m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag(IsRun4 ? "simBmtfDigis": "gmtStage2Digis","BMTF"));
-  m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag(IsRun4 ? "simOmtfDigis": "gmtStage2Digis","OMTF"));
+  // m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag(IsRun4 ? "simBmtfDigis": "gmtStage2Digis","BMTF"));
+  // m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag(IsRun4 ? "simOmtfDigis": "gmtStage2Digis","OMTF"));
 
   const auto& simVertex = iConfig.getParameter<edm::ParameterSet>("simVertex");
   simVertexInput_ = consumes<edm::SimVertexContainer>(simVertex.getParameter<edm::InputTag>("inputTag"));
@@ -266,7 +266,7 @@ config(iConfig)
   clctToken_ = consumes<CSCCLCTDigiCollection>(P_cscCLCT.getParameter<edm::InputTag>("inputTag"));
 
   const auto& P_gemDigi = iConfig.getParameter<edm::ParameterSet>("gemStripDigi");
-  if (useGEMs) gemDigiToken_ = consumes<GEMDigiCollection>(P_gemDigi.getParameter<edm::InputTag>("inputTag"));
+  gemDigiToken_ = consumes<GEMDigiCollection>(P_gemDigi.getParameter<edm::InputTag>("inputTag"));
 
   geomToken_ = esConsumes<GEMGeometry, MuonGeometryRecord>();
 
@@ -312,17 +312,17 @@ void NtupleMaker::beginJob()
   m_EMTF_muon_phi = new std::vector<float>;
   m_EMTF_muon_c = new std::vector<int>;
 
-  m_OMTF_muon_n = new std::vector<int>;
-  m_OMTF_muon_pt = new std::vector<float>;
-  m_OMTF_muon_eta = new std::vector<float>;
-  m_OMTF_muon_phi = new std::vector<float>;
-  m_OMTF_muon_c = new std::vector<int>;
-
-  m_BMTF_muon_n = new std::vector<int>;
-  m_BMTF_muon_pt = new std::vector<float>;
-  m_BMTF_muon_eta = new std::vector<float>;
-  m_BMTF_muon_phi = new std::vector<float>;
-  m_BMTF_muon_c = new std::vector<int>;
+  // m_OMTF_muon_n = new std::vector<int>;
+  // m_OMTF_muon_pt = new std::vector<float>;
+  // m_OMTF_muon_eta = new std::vector<float>;
+  // m_OMTF_muon_phi = new std::vector<float>;
+  // m_OMTF_muon_c = new std::vector<int>;
+  //
+  // m_BMTF_muon_n = new std::vector<int>;
+  // m_BMTF_muon_pt = new std::vector<float>;
+  // m_BMTF_muon_eta = new std::vector<float>;
+  // m_BMTF_muon_phi = new std::vector<float>;
+  // m_BMTF_muon_c = new std::vector<int>;
 
   m_cscSimHit_phi = new std::vector<float>;
   m_cscSimHit_eta = new std::vector<float>;
@@ -368,17 +368,17 @@ void NtupleMaker::beginJob()
   eventTree->Branch("EMTF_muon_phi", 	 &m_EMTF_muon_phi);
   eventTree->Branch("EMTF_muon_c", 	 &m_EMTF_muon_c);
 
-  eventTree->Branch("OMTF_muon_n",	 &m_OMTF_muon_n);
-  eventTree->Branch("OMTF_muon_pt", 	 &m_OMTF_muon_pt);
-  eventTree->Branch("OMTF_muon_eta", 	 &m_OMTF_muon_eta);
-  eventTree->Branch("OMTF_muon_phi", 	 &m_OMTF_muon_phi);
-  eventTree->Branch("OMTF_muon_c", 	 &m_OMTF_muon_c);
-
-  eventTree->Branch("BMTF_muon_n",	 &m_BMTF_muon_n);
-  eventTree->Branch("BMTF_muon_pt", 	 &m_BMTF_muon_pt);
-  eventTree->Branch("BMTF_muon_eta", 	 &m_BMTF_muon_eta);
-  eventTree->Branch("BMTF_muon_phi", 	 &m_BMTF_muon_phi);
-  eventTree->Branch("BMTF_muon_c", 	 &m_BMTF_muon_c);
+  // eventTree->Branch("OMTF_muon_n",	 &m_OMTF_muon_n);
+  // eventTree->Branch("OMTF_muon_pt", 	 &m_OMTF_muon_pt);
+  // eventTree->Branch("OMTF_muon_eta", 	 &m_OMTF_muon_eta);
+  // eventTree->Branch("OMTF_muon_phi", 	 &m_OMTF_muon_phi);
+  // eventTree->Branch("OMTF_muon_c", 	 &m_OMTF_muon_c);
+  //
+  // eventTree->Branch("BMTF_muon_n",	 &m_BMTF_muon_n);
+  // eventTree->Branch("BMTF_muon_pt", 	 &m_BMTF_muon_pt);
+  // eventTree->Branch("BMTF_muon_eta", 	 &m_BMTF_muon_eta);
+  // eventTree->Branch("BMTF_muon_phi", 	 &m_BMTF_muon_phi);
+  // eventTree->Branch("BMTF_muon_c", 	 &m_BMTF_muon_c);
 
   eventTree->Branch("cscSimHit_phi",&m_cscSimHit_phi);
   eventTree->Branch("cscSimHit_eta",&m_cscSimHit_eta);
@@ -454,17 +454,17 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   m_EMTF_muon_phi->clear();
   m_EMTF_muon_c->clear();
 
-  m_OMTF_muon_n->clear();
-  m_OMTF_muon_pt->clear();
-  m_OMTF_muon_eta->clear();
-  m_OMTF_muon_phi->clear();
-  m_OMTF_muon_c->clear();
-
-  m_BMTF_muon_n->clear();
-  m_BMTF_muon_pt->clear();
-  m_BMTF_muon_eta->clear();
-  m_BMTF_muon_phi->clear();
-  m_BMTF_muon_c->clear();
+  // m_OMTF_muon_n->clear();
+  // m_OMTF_muon_pt->clear();
+  // m_OMTF_muon_eta->clear();
+  // m_OMTF_muon_phi->clear();
+  // m_OMTF_muon_c->clear();
+  //
+  // m_BMTF_muon_n->clear();
+  // m_BMTF_muon_pt->clear();
+  // m_BMTF_muon_eta->clear();
+  // m_BMTF_muon_phi->clear();
+  // m_BMTF_muon_c->clear();
 
   m_cscSimHit_phi->clear();
   m_cscSimHit_eta->clear();
@@ -605,7 +605,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // cout << "Mathcer initialized" <<endl;
       std::shared_ptr<CSCSimHitMatcher> cscsimhits = match->cscSimHits();
       std::shared_ptr<GEMSimHitMatcher> gemsimhits;
-      if (useGEMs) gemsimhits = match->gemSimHits();
+      gemsimhits = match->gemSimHits();
       // cout << "GEMSimHits initialized" <<endl;
       for (int istation = 1; istation < 5; ++istation) {
         const auto& cscIds = cscsimhits->chamberIdsStation(istation);
@@ -625,23 +625,21 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         }
       }
       if (DebugMode) cout << "cscSimHits Finished, starting gemSimHits" << endl;
-      if (useGEMs) {
-        const auto& gemIds = gemsimhits->detIds();
-        for (const auto&p1 :gemIds) {
-          GEMDetId id1(p1);
-          int istation = id1.station();
-          const auto& hits = gemsimhits->hitsInDetId(p1);
-          for (auto& hit : hits) {
-            PSimHitContainer hitc;
-            hitc.push_back(hit);
-            GlobalPoint gp = gemsimhits->simHitsMeanPosition(hits);
-            m_gemSimHit_phi->push_back(gp.phi());
-            m_gemSimHit_eta->push_back(gp.eta());
-            m_gemSimHit_z->push_back(gp.z());
-            m_gemSimHit_r->push_back(gp.perp());
-            m_gemSimHit_station->push_back(istation);
-            m_gemSimHit_matchTp->push_back(tp_index);
-          }
+      const auto& gemIds = gemsimhits->detIds();
+      for (const auto&p1 :gemIds) {
+        GEMDetId id1(p1);
+        int istation = id1.station();
+        const auto& hits = gemsimhits->hitsInDetId(p1);
+        for (auto& hit : hits) {
+          PSimHitContainer hitc;
+          hitc.push_back(hit);
+          GlobalPoint gp = gemsimhits->simHitsMeanPosition(hits);
+          m_gemSimHit_phi->push_back(gp.phi());
+          m_gemSimHit_eta->push_back(gp.eta());
+          m_gemSimHit_z->push_back(gp.z());
+          m_gemSimHit_r->push_back(gp.perp());
+          m_gemSimHit_station->push_back(istation);
+          m_gemSimHit_matchTp->push_back(tp_index);
         }
       }
       if (DebugMode) cout << "gemSimhits Finished, starting muonCandidate" <<endl;
@@ -710,19 +708,16 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         }
       }
       if (DebugMode) cout << "Finished Loop over matchCscStubsA/CLCT (match->cscStubs()) " << endl;
-
-      if(useGEMs) {
-        auto gemDigis_ = match->gemDigis();
-        const auto& detidsDigi = gemDigis_->detIdsDigi();
-        // if (detidsDigi.size() == 0) cout << "!!!! detidsDigi is empty" <<endl;
-        // else cout << "~~~~ detidsDigi is not empty" <<endl;
-        for (const auto& id : detidsDigi) {
-          // if (gemDigis_->digisInDetId(id).size() == 0) cout  << "!!!! digisInDetId is empty while there are " << detidsDigi.size() << " detIds"<< endl;
-          for (auto gemdigi : gemDigis_->digisInDetId(id) ){
-            auto gp = gemDigis_->getGlobalPointDigi(id, gemdigi);
-            matchGemDigi->FillGP(gp);
-            matchGemDigi->FillGEM(gemdigi,id,tp_index);
-          }
+      auto gemDigis_ = match->gemDigis();
+      const auto& detidsDigi = gemDigis_->detIdsDigi();
+      // if (detidsDigi.size() == 0) cout << "!!!! detidsDigi is empty" <<endl;
+      // else cout << "~~~~ detidsDigi is not empty" <<endl;
+      for (const auto& id : detidsDigi) {
+        // if (gemDigis_->digisInDetId(id).size() == 0) cout  << "!!!! digisInDetId is empty while there are " << detidsDigi.size() << " detIds"<< endl;
+        for (auto gemdigi : gemDigis_->digisInDetId(id) ){
+          auto gp = gemDigis_->getGlobalPointDigi(id, gemdigi);
+          matchGemDigi->FillGP(gp);
+          matchGemDigi->FillGEM(gemdigi,id,tp_index);
         }
       }
     } // End of Muon Loop
@@ -742,12 +737,12 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (DebugMode) cout << "Finished TP Iteration" << endl<< endl;
 
   Handle< BXVector<l1t::RegionalMuonCand> > emtfs;
-  Handle< BXVector<l1t::RegionalMuonCand> > omtfs;
-  Handle< BXVector<l1t::RegionalMuonCand> > bmtfs;
+  // Handle< BXVector<l1t::RegionalMuonCand> > omtfs;
+  // Handle< BXVector<l1t::RegionalMuonCand> > bmtfs;
 
   iEvent.getByToken(m_emtfToken,emtfs);
-  iEvent.getByToken(m_omtfToken,omtfs);
-  iEvent.getByToken(m_bmtfToken,bmtfs);
+  // iEvent.getByToken(m_omtfToken,omtfs);
+  // iEvent.getByToken(m_bmtfToken,bmtfs);
 
   int nEMTF=0;
   for (auto it = emtfs->begin(0); it != emtfs->end(0); it++){
@@ -764,33 +759,33 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
   m_EMTF_muon_n->push_back(nEMTF);
 
-  int nOMTF=0;
-  for (auto it = omtfs->begin(0); it != omtfs->end(0); it++){
-    m_OMTF_muon_eta->push_back(it->hwEta()*0.010875);
-    m_OMTF_muon_phi->push_back(l1t::MicroGMTConfiguration::calcGlobalPhi(it->hwPhi(), it->trackFinderType(), it->processor())*2*M_PI/576.);
-    m_OMTF_muon_pt->push_back(it->hwPt()*0.5);
-    if(!it->hwSignValid()) m_OMTF_muon_c->push_back(0);
-    else{
-      if(it->hwSign())   m_OMTF_muon_c->push_back(-1);
-      else 		   m_OMTF_muon_c->push_back(1);
-    }
-    ++nOMTF;
-  }
-  m_OMTF_muon_n->push_back(nOMTF);
-
-  int nBMTF=0;
-  for (auto it = bmtfs->begin(0); it != bmtfs->end(0); it++){
-    m_BMTF_muon_eta->push_back(it->hwEta()*0.010875);
-    m_BMTF_muon_phi->push_back(l1t::MicroGMTConfiguration::calcGlobalPhi(it->hwPhi(), it->trackFinderType(), it->processor())*2*M_PI/576.);
-    m_BMTF_muon_pt->push_back(it->hwPt()*0.5);
-    if(!it->hwSignValid()) m_BMTF_muon_c->push_back(0);
-    else{
-      if(it->hwSign())   m_BMTF_muon_c->push_back(-1);
-      else 		   m_BMTF_muon_c->push_back(1);
-    }
-    ++nBMTF;
-  }
-  m_BMTF_muon_n->push_back(nBMTF);
+  // int nOMTF=0;
+  // for (auto it = omtfs->begin(0); it != omtfs->end(0); it++){
+  //   m_OMTF_muon_eta->push_back(it->hwEta()*0.010875);
+  //   m_OMTF_muon_phi->push_back(l1t::MicroGMTConfiguration::calcGlobalPhi(it->hwPhi(), it->trackFinderType(), it->processor())*2*M_PI/576.);
+  //   m_OMTF_muon_pt->push_back(it->hwPt()*0.5);
+  //   if(!it->hwSignValid()) m_OMTF_muon_c->push_back(0);
+  //   else{
+  //     if(it->hwSign())   m_OMTF_muon_c->push_back(-1);
+  //     else 		   m_OMTF_muon_c->push_back(1);
+  //   }
+  //   ++nOMTF;
+  // }
+  // m_OMTF_muon_n->push_back(nOMTF);
+  //
+  // int nBMTF=0;
+  // for (auto it = bmtfs->begin(0); it != bmtfs->end(0); it++){
+  //   m_BMTF_muon_eta->push_back(it->hwEta()*0.010875);
+  //   m_BMTF_muon_phi->push_back(l1t::MicroGMTConfiguration::calcGlobalPhi(it->hwPhi(), it->trackFinderType(), it->processor())*2*M_PI/576.);
+  //   m_BMTF_muon_pt->push_back(it->hwPt()*0.5);
+  //   if(!it->hwSignValid()) m_BMTF_muon_c->push_back(0);
+  //   else{
+  //     if(it->hwSign())   m_BMTF_muon_c->push_back(-1);
+  //     else 		   m_BMTF_muon_c->push_back(1);
+  //   }
+  //   ++nBMTF;
+  // }
+  // m_BMTF_muon_n->push_back(nBMTF);
 
   if (DebugMode) cout << "Finished regional Muons started allCscStubs (CSCCorrelatedLCTDigiCollection)" << endl;
 
@@ -896,20 +891,19 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   if (DebugMode) cout << "Finished allCLCT, started GEMDigis" << endl;
   // All GEMDigis
-  if (useGEMs) {
-    edm::Handle<GEMDigiCollection> gemDigisH_;
-    iEvent.getByToken(gemDigiToken_,gemDigisH_);
-    const GEMDigiCollection& gems = *gemDigisH_.product();
-    for (auto it = gems.begin(); it != gems.end(); ++it) {
-      const auto& digivec = (*it).second;
-      const GEMDetId& detid = (*it).first;
-      for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
-        auto gp = match->gemDigis()->getGlobalPointDigi(detid, *itdigi);
-        // auto gp2 =  getGlobalPointDigi(detid,*itdigi); // Borrowed position function
-        // if (gp.phi() != gp2.phi()) cout << "inconsistent function" <<endl;
-        allGemDigi->FillGP(gp);
-        allGemDigi->FillGEM(*itdigi,detid.rawId());
-      }
+  edm::Handle<GEMDigiCollection> gemDigisH_;
+  iEvent.getByToken(gemDigiToken_,gemDigisH_);
+  const GEMDigiCollection& gems = *gemDigisH_.product();
+  for (auto it = gems.begin(); it != gems.end(); ++it) {
+    if (DebugMode) cout << "Here is a gemDigi" <<endl;
+    const auto& digivec = (*it).second;
+    const GEMDetId& detid = (*it).first;
+    for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
+      auto gp = match->gemDigis()->getGlobalPointDigi(detid, *itdigi);
+      // auto gp2 =  getGlobalPointDigi(detid,*itdigi); // Borrowed position function
+      // if (gp.phi() != gp2.phi()) cout << "inconsistent function" <<endl;
+      allGemDigi->FillGP(gp);
+      allGemDigi->FillGEM(*itdigi,detid.rawId());
     }
   }
   if (DebugMode) cout << "Finished GEMDigis, started Filling Tree" << endl;

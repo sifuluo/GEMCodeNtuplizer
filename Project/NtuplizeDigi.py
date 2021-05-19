@@ -155,7 +155,8 @@ ana.gemStripDigi = cms.PSet(
     matchDeltaStrip = cms.int32(1),
     matchToSimLink = cms.bool(False)
 )
-ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
+if not IsRun4:
+    ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
 process.ana = cms.Path(ana)
 
 process.endjob_step = cms.EndPath(process.endOfProcess)

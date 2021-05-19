@@ -146,7 +146,16 @@ process = runOn110XMC(process)
 #     tag = cms.string("GEMeMapDummy"),
 #     connect = cms.string("sqlite_file:GEMeMapDummy.db")))
 #     process.muonGEMDigis.useDBEMap = True
-# This part has been incorporated in runOn120XMC()
+# This part has been incorporated in runOn110XMC()
+
+# process.GlobalTag.toGet = cms.VPSet(
+#     cms.PSet(record = cms.string("GEMeMapRcd"),
+#         tag = cms.string("GEMeMapFull"),
+#         connect = cms.string('sqlite_file:GEMeMap_Full.db')
+#         )
+# )
+# process.muonGEMDigis.useDBEMap = True
+# process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
 
 # process.SimL1Emulator = cms.Sequence(
 #     process.simMuonGEMPadDigis *
@@ -215,7 +224,6 @@ ana.gemStripDigi = cms.PSet(
     matchDeltaStrip = cms.int32(1),
     matchToSimLink = cms.bool(False)
 )
-# ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisRun3ILT","")
 process.ana = cms.Path(ana)
 
 

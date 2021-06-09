@@ -32,6 +32,7 @@ public:
     lct_type = lct_type_; // 0 for LCT, 1 for ALCT, 2 for CLCT, 3 for GemDigi
     IsMatched = match_;
 
+    // LCT
     if (lct_type == 0) {
       phi = new std::vector<float>;
       eta = new std::vector<float>;
@@ -66,6 +67,8 @@ public:
         evttree->Branch(name+"_matchTp", &matchTp);
       }
     }
+
+    // ALCT
     else if (lct_type == 1) {
       detId = new std::vector<int>;
       keywire = new std::vector<int>;
@@ -78,6 +81,8 @@ public:
       evttree->Branch(name+"_position", &position);
       evttree->Branch(name+"_valid", &valid);
     }
+
+    //CLCT
     else if (lct_type == 2) {
       detId = new std::vector<int>;
       strip = new std::vector<int>;
@@ -98,6 +103,8 @@ public:
       evttree->Branch(name+"_pattern", &pattern);
       evttree->Branch(name+"_slope", &slope);
     }
+
+    // GEM
     else if (lct_type == 3) {
       phi = new std::vector<float>;
       eta = new std::vector<float>;

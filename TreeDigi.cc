@@ -124,6 +124,29 @@ public:
         evttree->Branch(name+"_matchTp", &matchTp);
       }
     }
+
+    // GEMPad
+    else if (lct_type == 4) {
+      phi = new std::vector<float>;
+      eta = new std::vector<float>;
+      z = new std::vector<float>;
+      r = new std::vector<float>;
+      detId = new std::vector<int>;
+      pad = new std::vector<int>;
+      part = new std::vector<int>;
+      evttree->Branch(name+"_phi", &phi);
+      evttree->Branch(name+"_eta", &eta);
+      evttree->Branch(name+"_z", &z);
+      evttree->Branch(name+"_r", &r);
+      evttree->Branch(name+"_detId", &detId);
+      evttree->Branch(name+"_pad", &pad);
+      evttree->Branch(name+"_part", &part);
+
+      if (IsMatched) {
+        matchCSC = new std::vector<int>;
+        evttree->Branch(name+"_matchCSC", &matchCSC);
+      }
+    }
   }
 
   void Reset() {
@@ -175,6 +198,18 @@ public:
         matchTp->clear();
       }
     }
+    else if (lct_type == 4) {
+      phi->clear();
+      eta->clear();
+      z->clear();
+      r->clear();
+      detId->clear();
+      pad->clear();
+      part->clear();
+      if (IsMatched) {
+        matchCSC->clear();
+      }
+    }
   }
 
   void FillGP(GlobalPoint gp) {
@@ -221,9 +256,15 @@ public:
 
   void FillGEM(GEMDigi gemdigi, int rawid, int tp_index = -1) {
     strip->push_back(gemdigi.strip());
-
     detId->push_back(rawid);
     if (tp_index != -1) matchTp->push_back(tp_index);
+  }
+
+  void FillGEMPad(GEMPadDigi gempad, int rawid, int csc_index = -1) {
+    pad->push_back(gempad.pad());
+    part->push_back(gempad.nPartitions());
+    detId->push_back(rawid);
+    if (csc_index != -1) matchCSC->push_back(csc_index);
   }
 
   void FillDetId(int rawid) {
@@ -235,6 +276,7 @@ public:
 
   std::vector<int>*   detId;
   std::vector<int>*   matchTp;
+  std::vector<int>*   matchCSC;
 
   //Matrix extraction
   std::vector<int>*   hit;
@@ -256,13 +298,13 @@ public:
   std::vector<int>*   strip8;
   std::vector<bool>*  valid;
   std::vector<int>*   type;
+  std::vector<int>*   part;
+  std::vector<int>*   pad;
 
 private:
   TString name;
   int lct_type;
   bool IsMatched;
-
-
 };
 
 #endif

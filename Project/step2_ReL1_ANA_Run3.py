@@ -9,6 +9,8 @@ from Configuration.Eras.Era_Run3_cff import Run3
 
 options = VarParsing('analysis')
 options.register ("test", True, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
+options.register ("runOnRaw", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
+options.register ("runAna", False, VarParsing.multiplicity.singleton, VarParsing.varType.bool)
 options.parseArguments()
 
 process = cms.Process('ReL1',Run3)
@@ -25,6 +27,7 @@ process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.load('GEMCode.GEMValidation.GEMCSCAnalyzer_cff')
 
 nEvents = -1
 if options.test:
@@ -35,16 +38,13 @@ process.maxEvents = cms.untracked.PSet(
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
-# process.MessageLogger.suppressWarning = cms.untracked.vstring("muonGEMDigis","simEmtfDigis")
-# process.MessageLogger.suppressError = cms.untracked.vstring("simCscTriggerPrimitiveDigisRun3CCLUTILT")
-# process.MessageLogger.cerr.threshold = cms.untracked.string('ERROR')
-
 # Input source
+from GEMCode.GEMValidation.relValSamples import *
+inputFiles = RelValSingleMuPt10_120X_mcRun3_realistic_v10_noPU
+
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(
-        'file:RVSMPt100.root'
-        # '/store/mc/Run3Winter20DRMiniAOD/Mu_FlatPt1to1000-pythia8-gun/GEN-SIM-RAW/NoPU_110X_mcRun3_2021_realistic_v6-v3/10000/003C515F-E4D1-404D-8921-36A3FD7361E9.root'
-    ),
+    # fileNames = cms.untracked.vstring(*inputFiles),
+    fileNames = cms.untracked.vstring('file:step1Run3_pre2.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -115,32 +115,43 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '
 from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
 process = addCSCTriggerRun3(process)
 
+from GEMCode.GEMValidation.cscTriggerCustoms import addAnalysisRun3
+process = addAnalysisRun3(process)
+
+process.GEMCSCAnalyzer.gemStripDigi.verbose = 1
+process.GEMCSCAnalyzer.gemStripDigi.matchToSimLink = True
+process.GEMCSCAnalyzer.gemPadDigi.verbose = 1
+process.GEMCSCAnalyzer.gemPadCluster.verbose = 1
+process.GEMCSCAnalyzer.gemCoPadDigi.verbose = 1
+
 from GEMCode.GEMValidation.cscTriggerCustoms import runOn120XMC
-process = runOn120XMC(process)
-# process.GlobalTag.toGet = cms.VPSet(
-#     cms.PSet(record = cms.string("GEMeMapRcd"),
-#         tag = cms.string("GEMeMapFull"),
-#         connect = cms.string('sqlite_file:GEMeMap_Full.db')
-#         )
-# )
-# process.muonGEMDigis.useDBEMap = True
-# process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
+if options.runOnRaw:
+    process = runOn120XMC(process)
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.muonGEMDigis)
-process.raw2digi_step2 = cms.Path(process.RawToDigi)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
+process.ana_step = cms.Path(
+    process.GEMCSCAnalyzer
+    * process.GEMCSCAnalyzerRun3CCLUT
+)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 
-# Schedule definition
-process.schedule = cms.Schedule(
-    process.raw2digi_step2,
-    # process.raw2digi_step,
-    process.L1simulation_step,
-    process.endjob_step,
-    process.FEVTDEBUGoutput_step
+process.TFileService = cms.Service("TFileService",
+    fileName = cms.string("out_ana_run3.root")
 )
+
+# Schedule definition
+process.schedule = cms.Schedule()
+if options.runOnRaw:
+    process.schedule.extend([process.raw2digi_step])
+process.schedule.extend([process.L1simulation_step])
+if options.runAna:
+    process.schedule.extend([process.ana_step])
+process.schedule.extend([process.endjob_step])
+process.schedule.extend([process.FEVTDEBUGoutput_step])
+
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 

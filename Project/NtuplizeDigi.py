@@ -103,6 +103,13 @@ process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
 
+# process.GlobalTag.toGet = cms.VPSet(
+#     cms.PSet(record = cms.string("GEMeMapRcd"),
+#         tag = cms.string("GEMeMapFull"),
+#         connect = cms.string('sqlite_file:GEMeMap_Full.db')
+#         )
+# )
+
 process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
 
 from GEMCode.GEMValidation.simTrackMatching_cfi import simTrackPSet
@@ -155,9 +162,11 @@ ana.gemStripDigi = cms.PSet(
     matchDeltaStrip = cms.int32(1),
     matchToSimLink = cms.bool(False)
 )
-if not IsRun4:
-    ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
+ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
 process.ana = cms.Path(ana)
+
+# from GEMCode.GEMValidation.cscTriggerCustoms import runOn110XMC
+# process = runOn110XMC(process)
 
 process.endjob_step = cms.EndPath(process.endOfProcess)
 # process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)

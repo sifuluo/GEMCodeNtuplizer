@@ -34,10 +34,7 @@ public:
 
     // LCT
     if (lct_type == 0) {
-      phi = new std::vector<float>;
-      eta = new std::vector<float>;
-      z = new std::vector<float>;
-      r = new std::vector<float>;
+      InitGP(evttree);
       bend = new std::vector<int>;
       pattern = new std::vector<int>;
       slope = new std::vector<int>;
@@ -48,10 +45,6 @@ public:
       strip8 = new std::vector<int>;
       valid = new std::vector<bool>;
       type = new std::vector<int>;
-      evttree->Branch(name+"_phi", &phi);
-      evttree->Branch(name+"_eta", &eta);
-      evttree->Branch(name+"_z", &z);
-      evttree->Branch(name+"_r", &r);
       evttree->Branch(name+"_bend", &bend);
       evttree->Branch(name+"_pattern", &pattern);
       evttree->Branch(name+"_slope", &slope);
@@ -106,19 +99,11 @@ public:
 
     // GEM
     else if (lct_type == 3) {
-      phi = new std::vector<float>;
-      eta = new std::vector<float>;
-      z = new std::vector<float>;
-      r = new std::vector<float>;
+      InitGP(evttree);
       detId = new std::vector<int>;
       strip = new std::vector<int>;
-      evttree->Branch(name+"_phi", &phi);
-      evttree->Branch(name+"_eta", &eta);
-      evttree->Branch(name+"_z", &z);
-      evttree->Branch(name+"_r", &r);
       evttree->Branch(name+"_detId", &detId);
       evttree->Branch(name+"_strip", &strip);
-
       if (IsMatched) {
         matchTp = new std::vector<int>;
         evttree->Branch(name+"_matchTp", &matchTp);
@@ -127,34 +112,50 @@ public:
 
     // GEMPad
     else if (lct_type == 4) {
-      phi = new std::vector<float>;
-      eta = new std::vector<float>;
-      z = new std::vector<float>;
-      r = new std::vector<float>;
+      InitGP(evttree);
       detId = new std::vector<int>;
       pad = new std::vector<int>;
       part = new std::vector<int>;
-      evttree->Branch(name+"_phi", &phi);
-      evttree->Branch(name+"_eta", &eta);
-      evttree->Branch(name+"_z", &z);
-      evttree->Branch(name+"_r", &r);
       evttree->Branch(name+"_detId", &detId);
       evttree->Branch(name+"_pad", &pad);
       evttree->Branch(name+"_part", &part);
-
       if (IsMatched) {
         matchCSC = new std::vector<int>;
         evttree->Branch(name+"_matchCSC", &matchCSC);
       }
     }
+
+    //SimHit
+    else if (lct_type == 5) {
+      if (!IsMatched) cout << name << " not matched? SimHits are always matched!" << endl;
+      InitGP(evttree);
+      station = new std::vector<int>;
+      matchTp = new std::vector<int>;
+      evttree->Branch(name+"_station", &station);
+      evttree->Branch(name+"_matchTp", &matchTp);
+    }
+  }
+
+  void Init(TTree* evttree, TString name_, TString lct_type_st, bool match_ = false) {
+    int lct_type_ = -1;
+    if (lct_type_st == "LCT") lct_type_ = 0;
+    else if (lct_type_st == "ALCT") lct_type_ = 1;
+    else if (lct_type_st == "CLCT") lct_type_ = 2;
+    else if (lct_type_st == "GEM") lct_type_ = 3;
+    else if (lct_type_st == "GEMPad") lct_type_ = 4;
+    else if (lct_type_st == "SimHit") lct_type_ = 5;
+    // else if (lct_type_st == "TP") lct_type_ = 6;
+    // else if (lct_type_st == "RegionalMuon") lct_type_ = 7;
+    // else if (lct_type_st == "MatchMuon") lct_type_ = 8;
+
+
+    if (lct_type_ == -1) cout << "Wrong Data Type input for " << name_ << " as " << lct_type_st << endl;
+    else Init(evttree, name_, lct_type_, match_);
   }
 
   void Reset() {
     if (lct_type == 0) {
-      phi->clear();
-      eta->clear();
-      z->clear();
-      r->clear();
+      ResetGP();
       bend->clear();
       pattern->clear();
       slope->clear();
@@ -188,10 +189,7 @@ public:
       slope->clear();
     }
     else if (lct_type == 3) {
-      phi->clear();
-      eta->clear();
-      z->clear();
-      r->clear();
+      ResetGP();
       detId->clear();
       strip->clear();
       if (IsMatched) {
@@ -199,10 +197,7 @@ public:
       }
     }
     else if (lct_type == 4) {
-      phi->clear();
-      eta->clear();
-      z->clear();
-      r->clear();
+      ResetGP();
       detId->clear();
       pad->clear();
       part->clear();
@@ -210,6 +205,29 @@ public:
         matchCSC->clear();
       }
     }
+    else if (lct_type == 5) {
+      ResetGP();
+      station->clear();
+      matchTp->clear();
+    }
+  }
+
+  void ResetGP() {
+    eta->clear();
+    phi->clear();
+    z->clear();
+    r->clear();
+  }
+
+  void InitGP(TTree* evttree) {
+    phi = new std::vector<float>;
+    eta = new std::vector<float>;
+    z = new std::vector<float>;
+    r = new std::vector<float>;
+    evttree->Branch(name+"_phi", &phi);
+    evttree->Branch(name+"_eta", &eta);
+    evttree->Branch(name+"_z", &z);
+    evttree->Branch(name+"_r", &r);
   }
 
   void FillGP(GlobalPoint gp) {
@@ -267,6 +285,11 @@ public:
     if (csc_index != -1) matchCSC->push_back(csc_index);
   }
 
+  void FillSimHit(int station_, int matchTp_) {
+    station->push_back(station_);
+    matchTp->push_back(matchTp_);
+  }
+
   void FillDetId(int rawid) {
     detId->push_back(rawid);
   }
@@ -300,6 +323,24 @@ public:
   std::vector<int>*   type;
   std::vector<int>*   part;
   std::vector<int>*   pad;
+
+  //SimHit
+  std::vector<int>* station;
+
+  // //TP
+  // std::vector<float>* pt;
+  // std::vector<float>* dxy;
+  // std::vector<float>* d0;
+  // std::vector<float>* z0;
+  // std::vector<float>* d0_prod;
+  // std::vector<float>* z0_prod;
+  // std::vector<int>* pdgid;
+  // std::vector<int>* nmatch;
+  // std::vector<int>* nloosematch;
+  // std::vector<int>* nstub;
+  // std::vector<int>* eventid;
+  // std::vector<int>* charge;
+
 
 private:
   TString name;

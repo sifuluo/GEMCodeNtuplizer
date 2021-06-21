@@ -105,16 +105,6 @@ public:
   virtual void endJob();
   virtual void analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
-  // struct DigiContent{
-  //   int detid;
-  //   int strip;
-  //   int wire;
-  //   int quality;
-  //   std::vector<std::vector<int> > hits2D;
-  //   std::vector<int> hits;
-  //   std::vector<int> positions;
-  // };
-
   virtual void PrintHits(int iset, int idigi = -1);
   virtual int SaveHitMatrix(std::vector< std::vector<unsigned short> > hits, std::vector<int>* b_hit, std::vector<int>* b_pos, bool doprint = false, bool isclct = false);
   virtual std::vector<int> IntsToBinary(int n);
@@ -197,20 +187,6 @@ private:
   // std::vector<float>* m_BMTF_muon_phi;
   // std::vector<int>*   m_BMTF_muon_c;
 
-  std::vector<float>* m_cscSimHit_phi;
-  std::vector<float>* m_cscSimHit_eta;
-  std::vector<float>* m_cscSimHit_z;
-  std::vector<float>* m_cscSimHit_r;
-  std::vector<int>*   m_cscSimHit_station;
-  std::vector<int>*   m_cscSimHit_matchTp;
-
-  std::vector<float>* m_gemSimHit_phi;
-  std::vector<float>* m_gemSimHit_eta;
-  std::vector<float>* m_gemSimHit_z;
-  std::vector<float>* m_gemSimHit_r;
-  std::vector<int>*   m_gemSimHit_station;
-  std::vector<int>*   m_gemSimHit_matchTp;
-
   std::vector<float>* m_matchmuon_pt;
   std::vector<float>* m_matchmuon_eta;
   std::vector<float>* m_matchmuon_phi;
@@ -218,6 +194,7 @@ private:
   std::vector<int>*   m_matchmuon_type;
   std::vector<int>*   m_matchmuon_quality;
 
+  TreeDigi *cscSimHit, *gemSimHit;
   TreeDigi *allCscStubsLCT, *allCscStubsALCT, *allCscStubsCLCT;
   TreeDigi *allALCT, *allCLCT, *allGemDigi;
   TreeDigi *matchCscStubsLCT, *matchCscStubsALCT, *matchCscStubsCLCT, *matchGemDigi;
@@ -329,20 +306,6 @@ void NtupleMaker::beginJob()
   // m_BMTF_muon_phi = new std::vector<float>;
   // m_BMTF_muon_c = new std::vector<int>;
 
-  m_cscSimHit_phi = new std::vector<float>;
-  m_cscSimHit_eta = new std::vector<float>;
-  m_cscSimHit_z = new std::vector<float>;
-  m_cscSimHit_r = new std::vector<float>;
-  m_cscSimHit_station = new std::vector<int>;
-  m_cscSimHit_matchTp = new std::vector<int>;
-
-  m_gemSimHit_phi = new std::vector<float>;
-  m_gemSimHit_eta = new std::vector<float>;
-  m_gemSimHit_z = new std::vector<float>;
-  m_gemSimHit_r = new std::vector<float>;
-  m_gemSimHit_station = new std::vector<int>;
-  m_gemSimHit_matchTp = new std::vector<int>;
-
   m_matchmuon_pt     = new std::vector<float>;
   m_matchmuon_eta    = new std::vector<float>;
   m_matchmuon_phi    = new std::vector<float>;
@@ -385,20 +348,6 @@ void NtupleMaker::beginJob()
   // eventTree->Branch("BMTF_muon_phi", 	 &m_BMTF_muon_phi);
   // eventTree->Branch("BMTF_muon_c", 	 &m_BMTF_muon_c);
 
-  eventTree->Branch("cscSimHit_phi",&m_cscSimHit_phi);
-  eventTree->Branch("cscSimHit_eta",&m_cscSimHit_eta);
-  eventTree->Branch("cscSimHit_z",&m_cscSimHit_z);
-  eventTree->Branch("cscSimHit_r",&m_cscSimHit_r);
-  eventTree->Branch("cscSimHit_station",&m_cscSimHit_station);
-  eventTree->Branch("cscSimHit_matchTp",&m_cscSimHit_matchTp);
-
-  eventTree->Branch("gemSimHit_phi",&m_gemSimHit_phi);
-  eventTree->Branch("gemSimHit_eta",&m_gemSimHit_eta);
-  eventTree->Branch("gemSimHit_z",&m_gemSimHit_z);
-  eventTree->Branch("gemSimHit_r",&m_gemSimHit_r);
-  eventTree->Branch("gemSimHit_station",&m_gemSimHit_station);
-  eventTree->Branch("gemSimHit_matchTp",&m_gemSimHit_matchTp);
-
   eventTree->Branch("matchmuon_pt", &m_matchmuon_pt);
   eventTree->Branch("matchmuon_eta", &m_matchmuon_eta);
   eventTree->Branch("matchmuon_phi", &m_matchmuon_phi);
@@ -406,6 +355,8 @@ void NtupleMaker::beginJob()
   eventTree->Branch("matchmuon_type",&m_matchmuon_type);
   eventTree->Branch("matchmuon_quality",&m_matchmuon_quality);
 
+  cscSimHit = new TreeDigi();
+  gemSimHit = new TreeDigi();
   allCscStubsLCT = new TreeDigi();
   allCscStubsALCT = new TreeDigi();
   allCscStubsCLCT = new TreeDigi();
@@ -420,19 +371,21 @@ void NtupleMaker::beginJob()
   gemPadDigi2 = new TreeDigi();
   gemPadDigi = new TreeDigi();
 
-  allCscStubsLCT->Init(eventTree,"allCscStubsLCT",0,false);
-  allCscStubsALCT->Init(eventTree,"allCscStubsALCT",1,false);
-  allCscStubsCLCT->Init(eventTree,"allCscStubsCLCT",2,false);
-  allALCT->Init(eventTree,"allALCT",1,false);
-  allCLCT->Init(eventTree,"allCLCT",2,false);
-  allGemDigi->Init(eventTree,"allGemDigi",3,false);
-  matchCscStubsLCT->Init(eventTree,"matchCscStubsLCT",0,true);
-  matchCscStubsALCT->Init(eventTree,"matchCscStubsALCT",1,false);
-  matchCscStubsCLCT->Init(eventTree,"matchCscStubsCLCT",2,false);
-  matchGemDigi->Init(eventTree,"matchGemDigi",3,true);
-  gemPadDigi1->Init(eventTree,"gemPadDigi1",4,true);
-  gemPadDigi2->Init(eventTree,"gemPadDigi2",4,true);
-  gemPadDigi->Init(eventTree,"gemPadDigi",4,false);
+  cscSimHit->Init(eventTree,"cscSimHit","SimHit",true);
+  gemSimHit->Init(eventTree,"gemSimHit","SimHit",true);
+  allCscStubsLCT->Init(eventTree,"allCscStubsLCT","LCT",false);
+  allCscStubsALCT->Init(eventTree,"allCscStubsALCT","ALCT",false);
+  allCscStubsCLCT->Init(eventTree,"allCscStubsCLCT","CLCT",false);
+  allALCT->Init(eventTree,"allALCT","ALCT",false);
+  allCLCT->Init(eventTree,"allCLCT","CLCT",false);
+  allGemDigi->Init(eventTree,"allGemDigi","GEM",false);
+  matchCscStubsLCT->Init(eventTree,"matchCscStubsLCT","LCT",true);
+  matchCscStubsALCT->Init(eventTree,"matchCscStubsALCT","ALCT",false);
+  matchCscStubsCLCT->Init(eventTree,"matchCscStubsCLCT","CLCT",false);
+  matchGemDigi->Init(eventTree,"matchGemDigi","GEM",true);
+  gemPadDigi1->Init(eventTree,"gemPadDigi1","GEMPad",true);
+  gemPadDigi2->Init(eventTree,"gemPadDigi2","GEMPad",true);
+  gemPadDigi->Init(eventTree,"gemPadDigi","GEMPad",false);
 }
 
 void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -476,20 +429,6 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // m_BMTF_muon_phi->clear();
   // m_BMTF_muon_c->clear();
 
-  m_cscSimHit_phi->clear();
-  m_cscSimHit_eta->clear();
-  m_cscSimHit_z->clear();
-  m_cscSimHit_r->clear();
-  m_cscSimHit_station->clear();
-  m_cscSimHit_matchTp->clear();
-
-  m_gemSimHit_phi->clear();
-  m_gemSimHit_eta->clear();
-  m_gemSimHit_z->clear();
-  m_gemSimHit_r->clear();
-  m_gemSimHit_station->clear();
-  m_gemSimHit_matchTp->clear();
-
   m_matchmuon_pt->clear();
   m_matchmuon_eta->clear();
   m_matchmuon_phi->clear();
@@ -497,6 +436,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   m_matchmuon_type->clear();
   m_matchmuon_quality->clear();
 
+  cscSimHit->Reset();
+  gemSimHit->Reset();
   allCscStubsLCT->Reset();
   allCscStubsALCT->Reset();
   allCscStubsCLCT->Reset();
@@ -628,12 +569,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             PSimHitContainer hitc;
             hitc.push_back(hit);
             GlobalPoint gp = cscsimhits->simHitsMeanPosition(hitc);
-            m_cscSimHit_phi->push_back(gp.phi());
-            m_cscSimHit_eta->push_back(gp.eta());
-            m_cscSimHit_z->push_back(gp.z());
-            m_cscSimHit_r->push_back(gp.perp());
-            m_cscSimHit_station->push_back(istation);
-            m_cscSimHit_matchTp->push_back(tp_index);
+            cscSimHit->FillGP(gp);
+            cscSimHit->FillSimHit(istation, tp_index);
           }
         }
       }
@@ -647,12 +584,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           PSimHitContainer hitc;
           hitc.push_back(hit);
           GlobalPoint gp = gemsimhits->simHitsMeanPosition(hits);
-          m_gemSimHit_phi->push_back(gp.phi());
-          m_gemSimHit_eta->push_back(gp.eta());
-          m_gemSimHit_z->push_back(gp.z());
-          m_gemSimHit_r->push_back(gp.perp());
-          m_gemSimHit_station->push_back(istation);
-          m_gemSimHit_matchTp->push_back(tp_index);
+          gemSimHit->FillGP(gp);
+          gemSimHit->FillSimHit(istation, tp_index);
         }
       }
       if (DebugMode) cout << "gemSimhits Finished, starting muonCandidate" <<endl;
@@ -718,10 +651,10 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           matchCscStubsCLCT->FillCLCT(clctDigi,detid_.rawId());
 
           // GEMPad
+          if (DebugMode) cout << " Finishing a Stub, starting matched GEMPads" <<endl;
           if (detid_.ring() == 1 and (detid_.station() == 1 or detid_.station() == 2)) {
-            // bool matchl1(false), matchl2(false);
+            bool matchl1(false), matchl2(false);
             const GEMDetId gemDetIdL1(detid_.zendcap(), 1, detid_.station(), 1, detid_.chamber(), 0);
-
             for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL1.rawId())) {
               if (p == digi_.getGEM1()) {
                 auto gp1 = match->gemDigis()->getGlobalPointPad(gemDetIdL1.rawId(),p);
@@ -731,7 +664,6 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                 break;
               }
             }
-
             // Check if matched to an GEM pad L2
             const GEMDetId gemDetIdL2(detid_.zendcap(), 1, detid_.station(), 2, detid_.chamber(), 0);
             for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL2.rawId())) {
@@ -743,11 +675,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                 break;
               }
             }
+            // const auto& gem1 = digi_.getGEM1();
+            // const auto& gem2 = digi_.getGEM2();
+            // cout << " gem1 " << (gem1.isValid() ? "Valid" : "Invalid") <<endl;
+            // cout << " gem2 " << (gem2.isValid() ? "Valid" : "Invalid") <<endl;
 
-            const auto& gem1 = digi_.getGEM1();
-            const auto& gem2 = digi_.getGEM2();
-            cout << " gem1 " << (gem1.isValid() ? "Valid" : "Invalid") <<endl;
-            cout << " gem2 " << (gem2.isValid() ? "Valid" : "Invalid") <<endl;
             // cout << "Read" <<endl;
             // const GEMDetId gemDetIdL1(detid_.zendcap(), 1, detid_.station(), 1, detid_.chamber(), gem1.nPartitions());
             // const GEMDetId gemDetIdL2(detid_.zendcap(), 1, detid_.station(), 2, detid_.chamber(), gem2.nPartitions());

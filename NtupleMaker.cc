@@ -660,10 +660,15 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                 auto gp1 = match->gemDigis()->getGlobalPointPad(gemDetIdL1.rawId(),p);
                 gemPadDigi1->FillGP(gp1);
                 gemPadDigi1->FillGEMPad(p,gemDetIdL1.rawId(),digicount);
-                // matchl1 = true;
+                matchl1 = true;
                 break;
               }
             }
+            if (!matchl1) {
+              gemPadDigi1->FillGP0();
+              gemPadDigi1->FillGEMPad0(gemDetIdL1.rawId(),digicount);
+            }
+
             // Check if matched to an GEM pad L2
             const GEMDetId gemDetIdL2(detid_.zendcap(), 1, detid_.station(), 2, detid_.chamber(), 0);
             for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL2.rawId())) {
@@ -671,9 +676,13 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                 auto gp2 = match->gemDigis()->getGlobalPointPad(gemDetIdL2.rawId(),p);
                 gemPadDigi2->FillGP(gp2);
                 gemPadDigi2->FillGEMPad(p,gemDetIdL2.rawId(),digicount);
-                // matchl2 = true;
+                matchl2 = true;
                 break;
               }
+            }
+            if (!matchl2) {
+              gemPadDigi2->FillGP0();
+              gemPadDigi2->FillGEMPad0(gemDetIdL2.rawId(),digicount);
             }
             // const auto& gem1 = digi_.getGEM1();
             // const auto& gem2 = digi_.getGEM2();

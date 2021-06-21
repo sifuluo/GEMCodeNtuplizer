@@ -27,13 +27,13 @@ public:
 
   }
 
-  void Init(TTree* evttree, TString name_, int lct_type_, bool match_ = false) {
+  void Init(TTree* evttree, TString name_, int data_type_, bool match_ = false) {
     name = name_;
-    lct_type = lct_type_; // 0 for LCT, 1 for ALCT, 2 for CLCT, 3 for GemDigi
+    data_type = data_type_; // 0 for LCT, 1 for ALCT, 2 for CLCT, 3 for GemDigi
     IsMatched = match_;
 
     // LCT
-    if (lct_type == 0) {
+    if (data_type == 0) {
       InitGP(evttree);
       bend = new std::vector<int>;
       pattern = new std::vector<int>;
@@ -62,7 +62,7 @@ public:
     }
 
     // ALCT
-    else if (lct_type == 1) {
+    else if (data_type == 1) {
       detId = new std::vector<int>;
       keywire = new std::vector<int>;
       hit = new std::vector<int>;
@@ -76,7 +76,7 @@ public:
     }
 
     //CLCT
-    else if (lct_type == 2) {
+    else if (data_type == 2) {
       detId = new std::vector<int>;
       strip = new std::vector<int>;
       strip8 = new std::vector<int>;
@@ -98,7 +98,7 @@ public:
     }
 
     // GEM
-    else if (lct_type == 3) {
+    else if (data_type == 3) {
       InitGP(evttree);
       detId = new std::vector<int>;
       strip = new std::vector<int>;
@@ -111,7 +111,7 @@ public:
     }
 
     // GEMPad
-    else if (lct_type == 4) {
+    else if (data_type == 4) {
       InitGP(evttree);
       detId = new std::vector<int>;
       pad = new std::vector<int>;
@@ -126,7 +126,7 @@ public:
     }
 
     //SimHit
-    else if (lct_type == 5) {
+    else if (data_type == 5) {
       if (!IsMatched) cout << name << " not matched? SimHits are always matched!" << endl;
       InitGP(evttree);
       station = new std::vector<int>;
@@ -136,25 +136,25 @@ public:
     }
   }
 
-  void Init(TTree* evttree, TString name_, TString lct_type_st, bool match_ = false) {
-    int lct_type_ = -1;
-    if (lct_type_st == "LCT") lct_type_ = 0;
-    else if (lct_type_st == "ALCT") lct_type_ = 1;
-    else if (lct_type_st == "CLCT") lct_type_ = 2;
-    else if (lct_type_st == "GEM") lct_type_ = 3;
-    else if (lct_type_st == "GEMPad") lct_type_ = 4;
-    else if (lct_type_st == "SimHit") lct_type_ = 5;
-    // else if (lct_type_st == "TP") lct_type_ = 6;
-    // else if (lct_type_st == "RegionalMuon") lct_type_ = 7;
-    // else if (lct_type_st == "MatchMuon") lct_type_ = 8;
+  void Init(TTree* evttree, TString name_, TString data_type_st, bool match_ = false) {
+    int data_type_ = -1;
+    if (data_type_st == "LCT") data_type_ = 0;
+    else if (data_type_st == "ALCT") data_type_ = 1;
+    else if (data_type_st == "CLCT") data_type_ = 2;
+    else if (data_type_st == "GEM") data_type_ = 3;
+    else if (data_type_st == "GEMPad") data_type_ = 4;
+    else if (data_type_st == "SimHit") data_type_ = 5;
+    // else if (data_type_st == "TP") data_type_ = 6;
+    // else if (data_type_st == "RegionalMuon") data_type_ = 7;
+    // else if (data_type_st == "MatchMuon") data_type_ = 8;
 
 
-    if (lct_type_ == -1) cout << "Wrong Data Type input for " << name_ << " as " << lct_type_st << endl;
-    else Init(evttree, name_, lct_type_, match_);
+    if (data_type_ == -1) cout << "Wrong Data Type input for " << name_ << " as " << data_type_st << endl;
+    else Init(evttree, name_, data_type_, match_);
   }
 
   void Reset() {
-    if (lct_type == 0) {
+    if (data_type == 0) {
       ResetGP();
       bend->clear();
       pattern->clear();
@@ -170,14 +170,14 @@ public:
         matchTp->clear();
       }
     }
-    else if (lct_type == 1) {
+    else if (data_type == 1) {
       detId->clear();
       keywire->clear();
       hit->clear();
       position->clear();
       valid->clear();
     }
-    else if (lct_type == 2) {
+    else if (data_type == 2) {
       detId->clear();
       strip->clear();
       strip8->clear();
@@ -188,7 +188,7 @@ public:
       pattern->clear();
       slope->clear();
     }
-    else if (lct_type == 3) {
+    else if (data_type == 3) {
       ResetGP();
       detId->clear();
       strip->clear();
@@ -196,7 +196,7 @@ public:
         matchTp->clear();
       }
     }
-    else if (lct_type == 4) {
+    else if (data_type == 4) {
       ResetGP();
       detId->clear();
       pad->clear();
@@ -205,7 +205,7 @@ public:
         matchCSC->clear();
       }
     }
-    else if (lct_type == 5) {
+    else if (data_type == 5) {
       ResetGP();
       station->clear();
       matchTp->clear();
@@ -235,6 +235,13 @@ public:
     eta->push_back(gp.eta());
     z->push_back(gp.z());
     r->push_back(gp.perp());
+  }
+
+  void FillGP0() {
+    phi->push_back(0.);
+    eta->push_back(0.);
+    z->push_back(0.);
+    r->push_back(0.);
   }
 
   void FillLCT(CSCCorrelatedLCTDigi lct, int rawid, int tp_index = -1) {
@@ -281,6 +288,13 @@ public:
   void FillGEMPad(GEMPadDigi gempad, int rawid, int csc_index = -1) {
     pad->push_back(gempad.pad());
     part->push_back(gempad.nPartitions());
+    detId->push_back(rawid);
+    if (csc_index != -1) matchCSC->push_back(csc_index);
+  }
+
+  void FillGEMPad0(int rawid, int csc_index = -1) {
+    pad->push_back(0);
+    part->push_back(0);
     detId->push_back(rawid);
     if (csc_index != -1) matchCSC->push_back(csc_index);
   }
@@ -344,7 +358,7 @@ public:
 
 private:
   TString name;
-  int lct_type;
+  int data_type;
   bool IsMatched;
 };
 

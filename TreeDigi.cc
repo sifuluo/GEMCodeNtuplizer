@@ -27,11 +27,11 @@ public:
 
   }
 
-  void Init(TTree* evttree, TString name_, int data_type_, bool match_ = false) {
+  void Init(TTree* evttree, TString name_, int data_type_, bool match_ = false, bool reader_ = false) {
     name = name_;
     data_type = data_type_; // 0 for LCT, 1 for ALCT, 2 for CLCT, 3 for GemDigi
     IsMatched = match_;
-
+    reader = reader_;
     // LCT
     if (data_type == 0) {
       InitGP(evttree);
@@ -134,6 +134,38 @@ public:
       evttree->Branch(name+"_station", &station);
       evttree->Branch(name+"_matchTp", &matchTp);
     }
+
+    else if (data_type == 6) {
+      if (IsMatched) cout << name << " Matched? TP can't match to anything" << endl;
+      pt           = new std::vector<float>;
+      eta          = new std::vector<float>;
+      phi          = new std::vector<float>;
+      dxy          = new std::vector<float>;
+      d0           = new std::vector<float>;
+      z0           = new std::vector<float>;
+      d0_prod      = new std::vector<float>;
+      z0_prod      = new std::vector<float>;
+      pdgid        = new std::vector<int>;
+      nmatch       = new std::vector<int>;
+      nloosematch  = new std::vector<int>;
+      nstub        = new std::vector<int>;
+      eventid      = new std::vector<int>;
+      charge       = new std::vector<int>;
+      evttree->Branch(name+"_pt",          &pt);
+      evttree->Branch(name+"_eta",         &eta);
+      evttree->Branch(name+"_phi",         &phi);
+      evttree->Branch(name+"_dxy",         &dxy);
+      evttree->Branch(name+"_d0",          &d0);
+      evttree->Branch(name+"_z0",          &z0);
+      evttree->Branch(name+"_d0_prod",     &d0_prod);
+      evttree->Branch(name+"_z0_prod",     &z0_prod);
+      evttree->Branch(name+"_pdgid",       &pdgid);
+      evttree->Branch(name+"_nmatch",      &nmatch);
+      evttree->Branch(name+"_nloosematch", &nloosematch);
+      evttree->Branch(name+"_nstub",       &nstub);
+      evttree->Branch(name+"_eventid",     &eventid);
+      evttree->Branch(name+"_charge",      &charge);
+    }
   }
 
   void Init(TTree* evttree, TString name_, TString data_type_st, bool match_ = false) {
@@ -144,7 +176,7 @@ public:
     else if (data_type_st == "GEM") data_type_ = 3;
     else if (data_type_st == "GEMPad") data_type_ = 4;
     else if (data_type_st == "SimHit") data_type_ = 5;
-    // else if (data_type_st == "TP") data_type_ = 6;
+    else if (data_type_st == "TP") data_type_ = 6;
     // else if (data_type_st == "RegionalMuon") data_type_ = 7;
     // else if (data_type_st == "MatchMuon") data_type_ = 8;
 
@@ -209,6 +241,22 @@ public:
       ResetGP();
       station->clear();
       matchTp->clear();
+    }
+    else if (data_type == 6) {
+      pt->clear();
+      eta->clear();
+      phi->clear();
+      dxy->clear();
+      d0->clear();
+      z0->clear();
+      d0_prod->clear();
+      z0_prod->clear();
+      pdgid->clear();
+      nmatch->clear();
+      nloosematch->clear();
+      nstub->clear();
+      eventid->clear();
+      charge->clear();
     }
   }
 
@@ -341,25 +389,26 @@ public:
   //SimHit
   std::vector<int>* station;
 
-  // //TP
-  // std::vector<float>* pt;
-  // std::vector<float>* dxy;
-  // std::vector<float>* d0;
-  // std::vector<float>* z0;
-  // std::vector<float>* d0_prod;
-  // std::vector<float>* z0_prod;
-  // std::vector<int>* pdgid;
-  // std::vector<int>* nmatch;
-  // std::vector<int>* nloosematch;
-  // std::vector<int>* nstub;
-  // std::vector<int>* eventid;
-  // std::vector<int>* charge;
+  //TP
+  std::vector<float>* pt;
+  std::vector<float>* dxy;
+  std::vector<float>* d0;
+  std::vector<float>* z0;
+  std::vector<float>* d0_prod;
+  std::vector<float>* z0_prod;
+  std::vector<int>* pdgid;
+  std::vector<int>* nmatch;
+  std::vector<int>* nloosematch;
+  std::vector<int>* nstub;
+  std::vector<int>* eventid;
+  std::vector<int>* charge;
 
 
 private:
   TString name;
   int data_type;
   bool IsMatched;
+  bool reader;
 };
 
 #endif

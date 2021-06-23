@@ -152,21 +152,21 @@ private:
   // Ntuple
   TTree* eventTree;
 
-  // Tracking particles
-  std::vector<float>* m_tp_pt;
-  std::vector<float>* m_tp_eta;
-  std::vector<float>* m_tp_phi;
-  std::vector<float>* m_tp_dxy;
-  std::vector<float>* m_tp_d0;
-  std::vector<float>* m_tp_z0;
-  std::vector<float>* m_tp_d0_prod;
-  std::vector<float>* m_tp_z0_prod;
-  std::vector<int>*   m_tp_pdgid;
-  std::vector<int>*   m_tp_nmatch;
-  std::vector<int>*   m_tp_nloosematch;
-  std::vector<int>*   m_tp_nstub;
-  std::vector<int>*   m_tp_eventid;
-  std::vector<int>*   m_tp_charge;
+  // // Tracking particles
+  // std::vector<float>* m_tp_pt;
+  // std::vector<float>* m_tp_eta;
+  // std::vector<float>* m_tp_phi;
+  // std::vector<float>* m_tp_dxy;
+  // std::vector<float>* m_tp_d0;
+  // std::vector<float>* m_tp_z0;
+  // std::vector<float>* m_tp_d0_prod;
+  // std::vector<float>* m_tp_z0_prod;
+  // std::vector<int>*   m_tp_pdgid;
+  // std::vector<int>*   m_tp_nmatch;
+  // std::vector<int>*   m_tp_nloosematch;
+  // std::vector<int>*   m_tp_nstub;
+  // std::vector<int>*   m_tp_eventid;
+  // std::vector<int>*   m_tp_charge;
 
   // Regional Muon candidates
   std::vector<int>*   m_EMTF_muon_n;
@@ -194,6 +194,7 @@ private:
   std::vector<int>*   m_matchmuon_type;
   std::vector<int>*   m_matchmuon_quality;
 
+  TreeDigi *tp;
   TreeDigi *cscSimHit, *gemSimHit;
   TreeDigi *allCscStubsLCT, *allCscStubsALCT, *allCscStubsCLCT;
   TreeDigi *allALCT, *allCLCT, *allGemDigi;
@@ -273,20 +274,20 @@ void NtupleMaker::beginJob()
 
   edm::Service<TFileService> fs;
 
-  m_tp_pt      = new std::vector<float>;
-  m_tp_eta     = new std::vector<float>;
-  m_tp_phi     = new std::vector<float>;
-  m_tp_dxy     = new std::vector<float>;
-  m_tp_d0      = new std::vector<float>;
-  m_tp_z0      = new std::vector<float>;
-  m_tp_d0_prod = new std::vector<float>;
-  m_tp_z0_prod = new std::vector<float>;
-  m_tp_pdgid   = new std::vector<int>;
-  m_tp_nmatch  = new std::vector<int>;
-  m_tp_nloosematch  = new std::vector<int>;
-  m_tp_nstub        = new std::vector<int>;
-  m_tp_eventid      = new std::vector<int>;
-  m_tp_charge       = new std::vector<int>;
+  // m_tp_pt      = new std::vector<float>;
+  // m_tp_eta     = new std::vector<float>;
+  // m_tp_phi     = new std::vector<float>;
+  // m_tp_dxy     = new std::vector<float>;
+  // m_tp_d0      = new std::vector<float>;
+  // m_tp_z0      = new std::vector<float>;
+  // m_tp_d0_prod = new std::vector<float>;
+  // m_tp_z0_prod = new std::vector<float>;
+  // m_tp_pdgid   = new std::vector<int>;
+  // m_tp_nmatch  = new std::vector<int>;
+  // m_tp_nloosematch  = new std::vector<int>;
+  // m_tp_nstub        = new std::vector<int>;
+  // m_tp_eventid      = new std::vector<int>;
+  // m_tp_charge       = new std::vector<int>;
 
   m_EMTF_muon_n = new std::vector<int>;
   m_EMTF_muon_pt = new std::vector<float>;
@@ -315,20 +316,20 @@ void NtupleMaker::beginJob()
 
   eventTree = fs->make<TTree>("eventTree", "Event tree");
 
-  eventTree->Branch("tp_pt",     &m_tp_pt);
-  eventTree->Branch("tp_eta",    &m_tp_eta);
-  eventTree->Branch("tp_phi",    &m_tp_phi);
-  eventTree->Branch("tp_dxy",    &m_tp_dxy);
-  eventTree->Branch("tp_d0",     &m_tp_d0);
-  eventTree->Branch("tp_z0",     &m_tp_z0);
-  eventTree->Branch("tp_d0_prod",     &m_tp_d0_prod);
-  eventTree->Branch("tp_z0_prod",     &m_tp_z0_prod);
-  eventTree->Branch("tp_pdgid",       &m_tp_pdgid);
-  eventTree->Branch("tp_nmatch",      &m_tp_nmatch);
-  eventTree->Branch("tp_nloosematch", &m_tp_nloosematch);
-  eventTree->Branch("tp_nstub",       &m_tp_nstub);
-  eventTree->Branch("tp_eventid",     &m_tp_eventid);
-  eventTree->Branch("tp_charge",      &m_tp_charge);
+  // eventTree->Branch("tp_pt",     &m_tp_pt);
+  // eventTree->Branch("tp_eta",    &m_tp_eta);
+  // eventTree->Branch("tp_phi",    &m_tp_phi);
+  // eventTree->Branch("tp_dxy",    &m_tp_dxy);
+  // eventTree->Branch("tp_d0",     &m_tp_d0);
+  // eventTree->Branch("tp_z0",     &m_tp_z0);
+  // eventTree->Branch("tp_d0_prod",     &m_tp_d0_prod);
+  // eventTree->Branch("tp_z0_prod",     &m_tp_z0_prod);
+  // eventTree->Branch("tp_pdgid",       &m_tp_pdgid);
+  // eventTree->Branch("tp_nmatch",      &m_tp_nmatch);
+  // eventTree->Branch("tp_nloosematch", &m_tp_nloosematch);
+  // eventTree->Branch("tp_nstub",       &m_tp_nstub);
+  // eventTree->Branch("tp_eventid",     &m_tp_eventid);
+  // eventTree->Branch("tp_charge",      &m_tp_charge);
 
   eventTree->Branch("EMTF_muon_n",	 &m_EMTF_muon_n);
   eventTree->Branch("EMTF_muon_pt",  	 &m_EMTF_muon_pt);
@@ -355,6 +356,7 @@ void NtupleMaker::beginJob()
   eventTree->Branch("matchmuon_type",&m_matchmuon_type);
   eventTree->Branch("matchmuon_quality",&m_matchmuon_quality);
 
+  tp = new TreeDigi();
   cscSimHit = new TreeDigi();
   gemSimHit = new TreeDigi();
   allCscStubsLCT = new TreeDigi();
@@ -371,6 +373,7 @@ void NtupleMaker::beginJob()
   gemPadDigi2 = new TreeDigi();
   gemPadDigi = new TreeDigi();
 
+  tp->Init(eventTree,"tp","TP",false);
   cscSimHit->Init(eventTree,"cscSimHit","SimHit",true);
   gemSimHit->Init(eventTree,"gemSimHit","SimHit",true);
   allCscStubsLCT->Init(eventTree,"allCscStubsLCT","LCT",false);
@@ -396,20 +399,20 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     return;
   }
 
-  m_tp_pt->clear();
-  m_tp_eta->clear();
-  m_tp_phi->clear();
-  m_tp_dxy->clear();
-  m_tp_d0->clear();
-  m_tp_z0->clear();
-  m_tp_d0_prod->clear();
-  m_tp_z0_prod->clear();
-  m_tp_pdgid->clear();
-  m_tp_nmatch->clear();
-  m_tp_nloosematch->clear();
-  m_tp_nstub->clear();
-  m_tp_eventid->clear();
-  m_tp_charge->clear();
+  // m_tp_pt->clear();
+  // m_tp_eta->clear();
+  // m_tp_phi->clear();
+  // m_tp_dxy->clear();
+  // m_tp_d0->clear();
+  // m_tp_z0->clear();
+  // m_tp_d0_prod->clear();
+  // m_tp_z0_prod->clear();
+  // m_tp_pdgid->clear();
+  // m_tp_nmatch->clear();
+  // m_tp_nloosematch->clear();
+  // m_tp_nstub->clear();
+  // m_tp_eventid->clear();
+  // m_tp_charge->clear();
 
   m_EMTF_muon_n->clear();
   m_EMTF_muon_pt->clear();
@@ -436,6 +439,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   m_matchmuon_type->clear();
   m_matchmuon_quality->clear();
 
+  tp->Reset();
   cscSimHit->Reset();
   gemSimHit->Reset();
   allCscStubsLCT->Reset();
@@ -534,17 +538,29 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     float tmp_tp_dxy = dxy;
     if (MyProcess==6 && (dxy > 1.0)) continue;
 
-    m_tp_pt->push_back(tmp_tp_pt);
-    m_tp_eta->push_back(tmp_tp_eta);
-    m_tp_phi->push_back(tmp_tp_phi);
-    m_tp_dxy->push_back(tmp_tp_dxy);
-    m_tp_z0->push_back(tmp_tp_z0);
-    m_tp_d0->push_back(tmp_tp_d0);
-    m_tp_z0_prod->push_back(tmp_tp_z0_prod);
-    m_tp_d0_prod->push_back(tmp_tp_d0_prod);
-    m_tp_pdgid->push_back(tmp_tp_pdgid);
-    m_tp_eventid->push_back(tmp_eventid);
-    m_tp_charge->push_back(tmp_tp_charge);
+    tp->pt->push_back(tmp_tp_pt);
+    tp->eta->push_back(tmp_tp_eta);
+    tp->phi->push_back(tmp_tp_phi);
+    tp->dxy->push_back(tmp_tp_dxy);
+    tp->z0->push_back(tmp_tp_z0);
+    tp->d0->push_back(tmp_tp_d0);
+    tp->z0_prod->push_back(tmp_tp_z0_prod);
+    tp->d0_prod->push_back(tmp_tp_d0_prod);
+    tp->pdgid->push_back(tmp_tp_pdgid);
+    tp->eventid->push_back(tmp_eventid);
+    tp->charge->push_back(tmp_tp_charge);
+
+    // m_tp_pt->push_back(tmp_tp_pt);
+    // m_tp_eta->push_back(tmp_tp_eta);
+    // m_tp_phi->push_back(tmp_tp_phi);
+    // m_tp_dxy->push_back(tmp_tp_dxy);
+    // m_tp_z0->push_back(tmp_tp_z0);
+    // m_tp_d0->push_back(tmp_tp_d0);
+    // m_tp_z0_prod->push_back(tmp_tp_z0_prod);
+    // m_tp_d0_prod->push_back(tmp_tp_d0_prod);
+    // m_tp_pdgid->push_back(tmp_tp_pdgid);
+    // m_tp_eventid->push_back(tmp_eventid);
+    // m_tp_charge->push_back(tmp_tp_charge);
 
 
 

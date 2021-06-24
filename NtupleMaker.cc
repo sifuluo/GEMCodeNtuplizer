@@ -152,22 +152,6 @@ private:
   // Ntuple
   TTree* eventTree;
 
-  // // Tracking particles
-  // std::vector<float>* m_tp_pt;
-  // std::vector<float>* m_tp_eta;
-  // std::vector<float>* m_tp_phi;
-  // std::vector<float>* m_tp_dxy;
-  // std::vector<float>* m_tp_d0;
-  // std::vector<float>* m_tp_z0;
-  // std::vector<float>* m_tp_d0_prod;
-  // std::vector<float>* m_tp_z0_prod;
-  // std::vector<int>*   m_tp_pdgid;
-  // std::vector<int>*   m_tp_nmatch;
-  // std::vector<int>*   m_tp_nloosematch;
-  // std::vector<int>*   m_tp_nstub;
-  // std::vector<int>*   m_tp_eventid;
-  // std::vector<int>*   m_tp_charge;
-
   // Regional Muon candidates
   std::vector<int>*   m_EMTF_muon_n;
   std::vector<float>* m_EMTF_muon_pt;
@@ -194,12 +178,11 @@ private:
   std::vector<int>*   m_matchmuon_type;
   std::vector<int>*   m_matchmuon_quality;
 
-  TreeDigi *tp;
-  TreeDigi *cscSimHit, *gemSimHit;
+  TreeDigi *tp, *cscSimHit, *gemSimHit;
   TreeDigi *allCscStubsLCT, *allCscStubsALCT, *allCscStubsCLCT;
   TreeDigi *allALCT, *allCLCT, *allGemDigi;
   TreeDigi *matchCscStubsLCT, *matchCscStubsALCT, *matchCscStubsCLCT, *matchGemDigi;
-  TreeDigi *gemPadDigi1, *gemPadDigi2, *gemPadDigi;
+  TreeDigi *matchCscGEM1, *matchCscGEM2, *allCscGEM1, *allCscGEM2, *gemPadDigi;
 
   std::unique_ptr<MatcherManager> match;
 
@@ -274,26 +257,11 @@ void NtupleMaker::beginJob()
 
   edm::Service<TFileService> fs;
 
-  // m_tp_pt      = new std::vector<float>;
-  // m_tp_eta     = new std::vector<float>;
-  // m_tp_phi     = new std::vector<float>;
-  // m_tp_dxy     = new std::vector<float>;
-  // m_tp_d0      = new std::vector<float>;
-  // m_tp_z0      = new std::vector<float>;
-  // m_tp_d0_prod = new std::vector<float>;
-  // m_tp_z0_prod = new std::vector<float>;
-  // m_tp_pdgid   = new std::vector<int>;
-  // m_tp_nmatch  = new std::vector<int>;
-  // m_tp_nloosematch  = new std::vector<int>;
-  // m_tp_nstub        = new std::vector<int>;
-  // m_tp_eventid      = new std::vector<int>;
-  // m_tp_charge       = new std::vector<int>;
-
-  m_EMTF_muon_n = new std::vector<int>;
-  m_EMTF_muon_pt = new std::vector<float>;
+  m_EMTF_muon_n   = new std::vector<int>;
+  m_EMTF_muon_pt  = new std::vector<float>;
   m_EMTF_muon_eta = new std::vector<float>;
   m_EMTF_muon_phi = new std::vector<float>;
-  m_EMTF_muon_c = new std::vector<int>;
+  m_EMTF_muon_c   = new std::vector<int>;
 
   // m_OMTF_muon_n = new std::vector<int>;
   // m_OMTF_muon_pt = new std::vector<float>;
@@ -307,29 +275,14 @@ void NtupleMaker::beginJob()
   // m_BMTF_muon_phi = new std::vector<float>;
   // m_BMTF_muon_c = new std::vector<int>;
 
-  m_matchmuon_pt     = new std::vector<float>;
-  m_matchmuon_eta    = new std::vector<float>;
-  m_matchmuon_phi    = new std::vector<float>;
-  m_matchmuon_charge = new std::vector<int>;
-  m_matchmuon_type   = new std::vector<int>;
-  m_matchmuon_quality= new std::vector<int>;
+  m_matchmuon_pt      = new std::vector<float>;
+  m_matchmuon_eta     = new std::vector<float>;
+  m_matchmuon_phi     = new std::vector<float>;
+  m_matchmuon_charge  = new std::vector<int>;
+  m_matchmuon_type    = new std::vector<int>;
+  m_matchmuon_quality = new std::vector<int>;
 
   eventTree = fs->make<TTree>("eventTree", "Event tree");
-
-  // eventTree->Branch("tp_pt",     &m_tp_pt);
-  // eventTree->Branch("tp_eta",    &m_tp_eta);
-  // eventTree->Branch("tp_phi",    &m_tp_phi);
-  // eventTree->Branch("tp_dxy",    &m_tp_dxy);
-  // eventTree->Branch("tp_d0",     &m_tp_d0);
-  // eventTree->Branch("tp_z0",     &m_tp_z0);
-  // eventTree->Branch("tp_d0_prod",     &m_tp_d0_prod);
-  // eventTree->Branch("tp_z0_prod",     &m_tp_z0_prod);
-  // eventTree->Branch("tp_pdgid",       &m_tp_pdgid);
-  // eventTree->Branch("tp_nmatch",      &m_tp_nmatch);
-  // eventTree->Branch("tp_nloosematch", &m_tp_nloosematch);
-  // eventTree->Branch("tp_nstub",       &m_tp_nstub);
-  // eventTree->Branch("tp_eventid",     &m_tp_eventid);
-  // eventTree->Branch("tp_charge",      &m_tp_charge);
 
   eventTree->Branch("EMTF_muon_n",	 &m_EMTF_muon_n);
   eventTree->Branch("EMTF_muon_pt",  	 &m_EMTF_muon_pt);
@@ -356,39 +309,43 @@ void NtupleMaker::beginJob()
   eventTree->Branch("matchmuon_type",&m_matchmuon_type);
   eventTree->Branch("matchmuon_quality",&m_matchmuon_quality);
 
-  tp = new TreeDigi();
-  cscSimHit = new TreeDigi();
-  gemSimHit = new TreeDigi();
-  allCscStubsLCT = new TreeDigi();
-  allCscStubsALCT = new TreeDigi();
-  allCscStubsCLCT = new TreeDigi();
-  allALCT = new TreeDigi();
-  allCLCT = new TreeDigi();
-  allGemDigi = new TreeDigi();
-  matchCscStubsLCT = new TreeDigi();
+  tp                = new TreeDigi();
+  cscSimHit         = new TreeDigi();
+  gemSimHit         = new TreeDigi();
+  allCscStubsLCT    = new TreeDigi();
+  allCscStubsALCT   = new TreeDigi();
+  allCscStubsCLCT   = new TreeDigi();
+  allALCT           = new TreeDigi();
+  allCLCT           = new TreeDigi();
+  allGemDigi        = new TreeDigi();
+  matchCscStubsLCT  = new TreeDigi();
   matchCscStubsALCT = new TreeDigi();
   matchCscStubsCLCT = new TreeDigi();
-  matchGemDigi = new TreeDigi();
-  gemPadDigi1 = new TreeDigi();
-  gemPadDigi2 = new TreeDigi();
-  gemPadDigi = new TreeDigi();
+  matchGemDigi      = new TreeDigi();
+  matchCscGEM1      = new TreeDigi();
+  matchCscGEM2      = new TreeDigi();
+  allCscGEM1        = new TreeDigi();
+  allCscGEM2        = new TreeDigi();
+  gemPadDigi        = new TreeDigi();
 
-  tp->Init(eventTree,"tp","TP",false);
-  cscSimHit->Init(eventTree,"cscSimHit","SimHit",true);
-  gemSimHit->Init(eventTree,"gemSimHit","SimHit",true);
-  allCscStubsLCT->Init(eventTree,"allCscStubsLCT","LCT",false);
-  allCscStubsALCT->Init(eventTree,"allCscStubsALCT","ALCT",false);
-  allCscStubsCLCT->Init(eventTree,"allCscStubsCLCT","CLCT",false);
-  allALCT->Init(eventTree,"allALCT","ALCT",false);
-  allCLCT->Init(eventTree,"allCLCT","CLCT",false);
-  allGemDigi->Init(eventTree,"allGemDigi","GEM",false);
-  matchCscStubsLCT->Init(eventTree,"matchCscStubsLCT","LCT",true);
+  tp               ->Init(eventTree,"tp","TP",false);
+  cscSimHit        ->Init(eventTree,"cscSimHit","SimHit",true);
+  gemSimHit        ->Init(eventTree,"gemSimHit","SimHit",true);
+  allCscStubsLCT   ->Init(eventTree,"allCscStubsLCT","LCT",false);
+  allCscStubsALCT  ->Init(eventTree,"allCscStubsALCT","ALCT",false);
+  allCscStubsCLCT  ->Init(eventTree,"allCscStubsCLCT","CLCT",false);
+  allALCT          ->Init(eventTree,"allALCT","ALCT",false);
+  allCLCT          ->Init(eventTree,"allCLCT","CLCT",false);
+  allGemDigi       ->Init(eventTree,"allGemDigi","GEM",false);
+  matchCscStubsLCT ->Init(eventTree,"matchCscStubsLCT","LCT",true);
   matchCscStubsALCT->Init(eventTree,"matchCscStubsALCT","ALCT",false);
   matchCscStubsCLCT->Init(eventTree,"matchCscStubsCLCT","CLCT",false);
-  matchGemDigi->Init(eventTree,"matchGemDigi","GEM",true);
-  gemPadDigi1->Init(eventTree,"gemPadDigi1","GEMPad",true);
-  gemPadDigi2->Init(eventTree,"gemPadDigi2","GEMPad",true);
-  gemPadDigi->Init(eventTree,"gemPadDigi","GEMPad",false);
+  matchGemDigi     ->Init(eventTree,"matchGemDigi","GEM",true);
+  matchCscGEM1     ->Init(eventTree,"matchCscGEM1","GEMPad",true);
+  matchCscGEM2     ->Init(eventTree,"matchCscGEM2","GEMPad",true);
+  allCscGEM1       ->Init(eventTree,"allCscGEM1","GEMPad",true);
+  allCscGEM2       ->Init(eventTree,"allCscGEM2","GEMPad",true);
+  gemPadDigi       ->Init(eventTree,"gemPadDigi","GEMPad",false);
 }
 
 void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -398,21 +355,6 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     cout << "The specified MyProcess is invalid! Exiting..." << endl;
     return;
   }
-
-  // m_tp_pt->clear();
-  // m_tp_eta->clear();
-  // m_tp_phi->clear();
-  // m_tp_dxy->clear();
-  // m_tp_d0->clear();
-  // m_tp_z0->clear();
-  // m_tp_d0_prod->clear();
-  // m_tp_z0_prod->clear();
-  // m_tp_pdgid->clear();
-  // m_tp_nmatch->clear();
-  // m_tp_nloosematch->clear();
-  // m_tp_nstub->clear();
-  // m_tp_eventid->clear();
-  // m_tp_charge->clear();
 
   m_EMTF_muon_n->clear();
   m_EMTF_muon_pt->clear();
@@ -452,8 +394,10 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   matchCscStubsALCT->Reset();
   matchCscStubsCLCT->Reset();
   matchGemDigi->Reset();
-  gemPadDigi1->Reset();
-  gemPadDigi2->Reset();
+  matchCscGEM1->Reset();
+  matchCscGEM2->Reset();
+  allCscGEM1->Reset();
+  allCscGEM2->Reset();
   gemPadDigi->Reset();
 
   if (DebugMode) cout << "Finished branch initialization" << endl;
@@ -549,20 +493,6 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     tp->pdgid->push_back(tmp_tp_pdgid);
     tp->eventid->push_back(tmp_eventid);
     tp->charge->push_back(tmp_tp_charge);
-
-    // m_tp_pt->push_back(tmp_tp_pt);
-    // m_tp_eta->push_back(tmp_tp_eta);
-    // m_tp_phi->push_back(tmp_tp_phi);
-    // m_tp_dxy->push_back(tmp_tp_dxy);
-    // m_tp_z0->push_back(tmp_tp_z0);
-    // m_tp_d0->push_back(tmp_tp_d0);
-    // m_tp_z0_prod->push_back(tmp_tp_z0_prod);
-    // m_tp_d0_prod->push_back(tmp_tp_d0_prod);
-    // m_tp_pdgid->push_back(tmp_tp_pdgid);
-    // m_tp_eventid->push_back(tmp_eventid);
-    // m_tp_charge->push_back(tmp_tp_charge);
-
-
 
     const SimTrack& t(tp_ptr->g4Tracks()[0]);
     if(abs(t.type())==13){
@@ -666,23 +596,23 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           if (doprintc && clctmultihit) cout << "CLCT Multihit found for matchCscStubsCLCT" << endl;
           matchCscStubsCLCT->FillCLCT(clctDigi,detid_.rawId());
 
-          // GEMPad
-          if (DebugMode) cout << " Finishing a Stub, starting matched GEMPads" <<endl;
+          // GEMPad for matchCscStubs
+          if (DebugMode) cout << " Finishing a matchCscStub, starting matchedCscStub GEMPads" <<endl;
           if (detid_.ring() == 1 and (detid_.station() == 1 or detid_.station() == 2)) {
             bool matchl1(false), matchl2(false);
             const GEMDetId gemDetIdL1(detid_.zendcap(), 1, detid_.station(), 1, detid_.chamber(), 0);
             for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL1.rawId())) {
               if (p == digi_.getGEM1()) {
                 auto gp1 = match->gemDigis()->getGlobalPointPad(gemDetIdL1.rawId(),p);
-                gemPadDigi1->FillGP(gp1);
-                gemPadDigi1->FillGEMPad(p,gemDetIdL1.rawId(),digicount);
+                matchCscGEM1->FillGP(gp1);
+                matchCscGEM1->FillGEMPad(p,gemDetIdL1.rawId(),digicount);
                 matchl1 = true;
                 break;
               }
             }
             if (!matchl1) {
-              gemPadDigi1->FillGP0();
-              gemPadDigi1->FillGEMPad0(gemDetIdL1.rawId(),digicount);
+              matchCscGEM1->FillGP0();
+              matchCscGEM1->FillGEMPad0(gemDetIdL1.rawId(),digicount);
             }
 
             // Check if matched to an GEM pad L2
@@ -690,15 +620,15 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL2.rawId())) {
               if (p == digi_.getGEM2()) {
                 auto gp2 = match->gemDigis()->getGlobalPointPad(gemDetIdL2.rawId(),p);
-                gemPadDigi2->FillGP(gp2);
-                gemPadDigi2->FillGEMPad(p,gemDetIdL2.rawId(),digicount);
+                matchCscGEM2->FillGP(gp2);
+                matchCscGEM2->FillGEMPad(p,gemDetIdL2.rawId(),digicount);
                 matchl2 = true;
                 break;
               }
             }
             if (!matchl2) {
-              gemPadDigi2->FillGP0();
-              gemPadDigi2->FillGEMPad0(gemDetIdL2.rawId(),digicount);
+              matchCscGEM2->FillGP0();
+              matchCscGEM2->FillGEMPad0(gemDetIdL2.rawId(),digicount);
             }
             // const auto& gem1 = digi_.getGEM1();
             // const auto& gem2 = digi_.getGEM2();
@@ -712,10 +642,10 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             // auto gp1 = match->gemDigis()->getGlobalPointPad(gemDetIdL1.rawId(), gem1);
             // auto gp2 = match->gemDigis()->getGlobalPointPad(gemDetIdL2.rawId(), gem2);
             // cout << "GP" << endl;
-            // gemPadDigi1->FillGP(gp1);
-            // gemPadDigi2->FillGP(gp2);
-            // gemPadDigi1->FillGEMPad(gem1, gemDetIdL1.rawId(), digicount);
-            // gemPadDigi2->FillGEMPad(gem2, gemDetIdL2.rawId(), digicount);
+            // matchCscGEM1->FillGP(gp1);
+            // matchCscGEM2->FillGP(gp2);
+            // matchCscGEM1->FillGEMPad(gem1, gemDetIdL1.rawId(), digicount);
+            // matchCscGEM2->FillGEMPad(gem2, gemDetIdL2.rawId(), digicount);
           }
 
           digicount++;
@@ -811,6 +741,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByToken(lctToken_, lctsH_);
   const CSCCorrelatedLCTDigiCollection& lcts = *lctsH_.product();
   int allCscStubs_index = 0;
+  int digicount = 0;
   for (auto it = lcts.begin(); it != lcts.end(); ++it) {
     const auto& digivec = (*it).second;
     const CSCDetId& detid = (*it).first;
@@ -849,7 +780,59 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if (doprintc && clctmultihit) cout << "CLCT Multihit found for allCscStubsCLCT" << endl;
       allCscStubsCLCT->FillCLCT(clctDigi,detid.rawId());
 
-      ++digi_index;
+      // GEMPad for allCscStubs
+      if (DebugMode) cout << " Finishing a allCscStub, starting allCscStub GEMPads" <<endl;
+      if (detid.ring() == 1 and (detid.station() == 1 or detid.station() == 2)) {
+        bool matchl1(false), matchl2(false);
+        const GEMDetId gemDetIdL1(detid.zendcap(), 1, detid.station(), 1, detid.chamber(), 0);
+        for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL1.rawId())) {
+          if (p == (*itdigi).getGEM1()) {
+            auto gp1 = match->gemDigis()->getGlobalPointPad(gemDetIdL1.rawId(),p);
+            allCscGEM1->FillGP(gp1);
+            allCscGEM1->FillGEMPad(p,gemDetIdL1.rawId(),digicount);
+            matchl1 = true;
+            break;
+          }
+        }
+        if (!matchl1) {
+          allCscGEM1->FillGP0();
+          allCscGEM1->FillGEMPad0(gemDetIdL1.rawId(),digicount);
+        }
+
+        // Check if matched to an GEM pad L2
+        const GEMDetId gemDetIdL2(detid.zendcap(), 1, detid.station(), 2, detid.chamber(), 0);
+        for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL2.rawId())) {
+          if (p == (*itdigi).getGEM2()) {
+            auto gp2 = match->gemDigis()->getGlobalPointPad(gemDetIdL2.rawId(),p);
+            allCscGEM2->FillGP(gp2);
+            allCscGEM2->FillGEMPad(p,gemDetIdL2.rawId(),digicount);
+            matchl2 = true;
+            break;
+          }
+        }
+        if (!matchl2) {
+          allCscGEM2->FillGP0();
+          allCscGEM2->FillGEMPad0(gemDetIdL2.rawId(),digicount);
+        }
+        // const auto& gem1 = digi_.getGEM1();
+        // const auto& gem2 = digi_.getGEM2();
+        // cout << " gem1 " << (gem1.isValid() ? "Valid" : "Invalid") <<endl;
+        // cout << " gem2 " << (gem2.isValid() ? "Valid" : "Invalid") <<endl;
+
+        // cout << "Read" <<endl;
+        // const GEMDetId gemDetIdL1(detid_.zendcap(), 1, detid_.station(), 1, detid_.chamber(), gem1.nPartitions());
+        // const GEMDetId gemDetIdL2(detid_.zendcap(), 1, detid_.station(), 2, detid_.chamber(), gem2.nPartitions());
+        // cout << "DetId = " << detid_.rawId() << ", gemDetIdL1 = " << gemDetIdL1.rawId() << ", gemDetIdL2 = " << gemDetIdL2.rawId() <<endl;
+        // auto gp1 = match->gemDigis()->getGlobalPointPad(gemDetIdL1.rawId(), gem1);
+        // auto gp2 = match->gemDigis()->getGlobalPointPad(gemDetIdL2.rawId(), gem2);
+        // cout << "GP" << endl;
+        // matchCscGEM1->FillGP(gp1);
+        // matchCscGEM2->FillGP(gp2);
+        // matchCscGEM1->FillGEMPad(gem1, gemDetIdL1.rawId(), digicount);
+        // matchCscGEM2->FillGEMPad(gem2, gemDetIdL2.rawId(), digicount);
+      }
+      digi_index++;
+      digicount++;
     }
     allCscStubs_index++;
   }

@@ -580,7 +580,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           const auto& alctDigi = digi_.getALCT();
           std::vector< std::vector<unsigned short> > alcthits = alctDigi.getHits();
           if (doprinta) cout << "For matchCscStubsALCTs; DetId: "<< detid_.rawId() <<", Digi Index: " << digi_index << ", keywire: "<< alctDigi.getKeyWG()<<" , lctDigiWire = "<<digi_.getKeyWG()<<endl;
-          if (alctDigi.getKeyWG() != digi_.getKeyWG() && doprinta) cout << "Inconsistent keywire: alctDigiWire = "<< alctDigi.getKeyWG() <<" , lctDigiWire = "<<digi_.getKeyWG()<<endl;
+          if (alctDigi.getKeyWG() != digi_.getKeyWG()) cout << "Inconsistent keywire: alctDigiWire = "<< alctDigi.getKeyWG() <<" , lctDigiWire = "<<digi_.getKeyWG()<<endl;
           // int alctmultihit = SaveHitMatrix(alcthits, m_matchCscStubsALCT_hit, m_matchCscStubsALCT_position,doprinta,false);
           int alctmultihit = SaveHitMatrix(alcthits, matchCscStubsALCT->hit, matchCscStubsALCT->position,doprinta,false);
           if (doprinta && alctmultihit) cout << "ALCT Multihit found for matchCscStubsALCT" << endl;
@@ -590,7 +590,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           const auto& clctDigi = digi_.getCLCT();
           std::vector< std::vector<unsigned short> > clcthits = clctDigi.getHits();
           if (doprintc) cout << "For matchCscStubsCLCTs; DetId: "<< detid_.rawId() <<", Digi Index: " << digi_index << ", strip: "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< digi_.getStrip()<<endl;
-          if (clctDigi.getStrip() != digi_.getStrip() && doprintc) cout << "Inconsistent strip: clctDigiStrip = "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< digi_.getStrip() <<endl;
+          // if (clctDigi.getStrip() != digi_.getStrip()) cout << "Inconsistent strip: clctDigiStrip = "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< digi_.getStrip() <<endl;
+          if (clctDigi.getSlope() != digi_.getSlope()) cout << "Inconsistent Slope: clctDigiSlope = "<< clctDigi.getSlope() <<" , lctDigiSlope = "<< digi_.getSlope() <<endl;
           // int clctmultihit = SaveHitMatrix(clcthits, m_matchCscStubsCLCT_hit, m_matchCscStubsCLCT_position,doprintc,true);
           int clctmultihit = SaveHitMatrix(clcthits, matchCscStubsCLCT->hit, matchCscStubsCLCT->position,doprintc,true);
           if (doprintc && clctmultihit) cout << "CLCT Multihit found for matchCscStubsCLCT" << endl;
@@ -599,6 +600,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           // GEMPad for matchCscStubs
           if (DebugMode) cout << " Finishing a matchCscStub, starting matchedCscStub GEMPads" <<endl;
           if (detid_.ring() == 1 and (detid_.station() == 1 or detid_.station() == 2)) {
+            if (digi_.getGEM1().pad() != 255 && digi_.getGEM2().pad() != 255 && digi_.getGEM1().nPartitions() != 8 && digi_.getGEM2().nPartitions() != 8) {
+              cout << "In station " << detid_.station() << " , ring " << detid_.ring() << endl;
+              cout << "GEM1 pad = " << digi_.getGEM1().pad() << " , part = " << digi_.getGEM1().nPartitions() <<endl;
+              cout << "GEM2 pad = " << digi_.getGEM2().pad() << " , part = " << digi_.getGEM2().nPartitions() <<endl;
+            }
             bool matchl1(false), matchl2(false);
             const GEMDetId gemDetIdL1(detid_.zendcap(), 1, detid_.station(), 1, detid_.chamber(), 0);
             for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL1.rawId())) {
@@ -763,7 +769,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       const auto& alctDigi = (*itdigi).getALCT();
       std::vector< std::vector<unsigned short> > alcthits = alctDigi.getHits();
       if (doprinta) cout << "For allCscStubsALCTs; DetId: "<< detid.rawId() <<", Digi Index: " << digi_index << ", keywire: "<< alctDigi.getKeyWG()<<" , lctDigiWire = "<<(*itdigi).getKeyWG() << endl;
-      if (alctDigi.getKeyWG() != (*itdigi).getKeyWG() && doprinta) cout << "Inconsistence keywire: alctDigiWire = "<< alctDigi.getKeyWG() <<" , lctDigiWire = "<<(*itdigi).getKeyWG()<<endl;
+      if (alctDigi.getKeyWG() != (*itdigi).getKeyWG()) cout << "Inconsistence keywire: alctDigiWire = "<< alctDigi.getKeyWG() <<" , lctDigiWire = "<<(*itdigi).getKeyWG()<<endl;
       // int alctmultihit = SaveHitMatrix(alcthits, m_allCscStubsALCT_hit, m_allCscStubsALCT_position,doprinta,false);
       int alctmultihit = SaveHitMatrix(alcthits, allCscStubsALCT->hit, allCscStubsALCT->position,doprinta,false);
       if (doprinta && alctmultihit) cout << "ALCT Multihit found for allCscStubsALCT" << endl;
@@ -774,7 +780,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       const auto& clctDigi = (*itdigi).getCLCT();
       std::vector< std::vector<unsigned short> > clcthits = clctDigi.getHits();
       if (doprintc) cout << "For allCscStubsCLCTs; DetId: "<< detid.rawId() <<", Digi Index:" << digi_index << ", strip: "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< (*itdigi).getStrip()<<endl;
-      if (clctDigi.getStrip() != (*itdigi).getStrip() && doprintc) cout << "Inconsistence strip: clctDigiStrip = "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< (*itdigi).getStrip() <<endl;
+      // if (clctDigi.getStrip() != (*itdigi).getStrip()) cout << "Inconsistence strip: clctDigiStrip = "<< clctDigi.getStrip() <<" , lctDigiStrip = "<< (*itdigi).getStrip() <<endl;
+      if (clctDigi.getSlope() != (*itdigi).getSlope()) cout << "Inconsistence slope: clctDigiSlope = "<< clctDigi.getSlope() <<" , lctDigiSlope = "<< (*itdigi).getSlope() <<endl;
       // int clctmultihit = SaveHitMatrix(clcthits, m_allCscStubsCLCT_hit, m_allCscStubsCLCT_position,doprintc,true);
       int clctmultihit = SaveHitMatrix(clcthits, allCscStubsCLCT->hit, allCscStubsCLCT->position,doprintc,true);
       if (doprintc && clctmultihit) cout << "CLCT Multihit found for allCscStubsCLCT" << endl;

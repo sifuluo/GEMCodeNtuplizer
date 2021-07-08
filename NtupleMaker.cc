@@ -153,11 +153,11 @@ private:
   TTree* eventTree;
 
   // Regional Muon candidates
-  std::vector<int>*   m_EMTF_muon_n;
-  std::vector<float>* m_EMTF_muon_pt;
-  std::vector<float>* m_EMTF_muon_eta;
-  std::vector<float>* m_EMTF_muon_phi;
-  std::vector<int>*   m_EMTF_muon_c;
+  // std::vector<int>*   m_EMTF_muon_n;
+  // std::vector<float>* m_EMTF_muon_pt;
+  // std::vector<float>* m_EMTF_muon_eta;
+  // std::vector<float>* m_EMTF_muon_phi;
+  // std::vector<int>*   m_EMTF_muon_c;
 
   // std::vector<int>*   m_OMTF_muon_n;
   // std::vector<float>* m_OMTF_muon_pt;
@@ -212,7 +212,7 @@ config(iConfig)
   TrackingParticleInputTag = iConfig.getParameter<edm::InputTag>("TrackingParticleInputTag");
   TrackingParticleToken_ = consumes< std::vector< TrackingParticle > >(TrackingParticleInputTag);
 
-  m_emtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simEmtfDigis","EMTF"));
+  // m_emtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag("simEmtfDigis","EMTF"));
   // m_bmtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag(IsRun4 ? "simBmtfDigis": "gmtStage2Digis","BMTF"));
   // m_omtfToken = consumes<l1t::RegionalMuonCandBxCollection>(edm::InputTag(IsRun4 ? "simOmtfDigis": "gmtStage2Digis","OMTF"));
 
@@ -257,11 +257,11 @@ void NtupleMaker::beginJob()
 
   edm::Service<TFileService> fs;
 
-  m_EMTF_muon_n   = new std::vector<int>;
-  m_EMTF_muon_pt  = new std::vector<float>;
-  m_EMTF_muon_eta = new std::vector<float>;
-  m_EMTF_muon_phi = new std::vector<float>;
-  m_EMTF_muon_c   = new std::vector<int>;
+  // m_EMTF_muon_n   = new std::vector<int>;
+  // m_EMTF_muon_pt  = new std::vector<float>;
+  // m_EMTF_muon_eta = new std::vector<float>;
+  // m_EMTF_muon_phi = new std::vector<float>;
+  // m_EMTF_muon_c   = new std::vector<int>;
 
   // m_OMTF_muon_n = new std::vector<int>;
   // m_OMTF_muon_pt = new std::vector<float>;
@@ -284,11 +284,11 @@ void NtupleMaker::beginJob()
 
   eventTree = fs->make<TTree>("eventTree", "Event tree");
 
-  eventTree->Branch("EMTF_muon_n",	 &m_EMTF_muon_n);
-  eventTree->Branch("EMTF_muon_pt",  	 &m_EMTF_muon_pt);
-  eventTree->Branch("EMTF_muon_eta", 	 &m_EMTF_muon_eta);
-  eventTree->Branch("EMTF_muon_phi", 	 &m_EMTF_muon_phi);
-  eventTree->Branch("EMTF_muon_c", 	 &m_EMTF_muon_c);
+  // eventTree->Branch("EMTF_muon_n",	 &m_EMTF_muon_n);
+  // eventTree->Branch("EMTF_muon_pt",  	 &m_EMTF_muon_pt);
+  // eventTree->Branch("EMTF_muon_eta", 	 &m_EMTF_muon_eta);
+  // eventTree->Branch("EMTF_muon_phi", 	 &m_EMTF_muon_phi);
+  // eventTree->Branch("EMTF_muon_c", 	 &m_EMTF_muon_c);
 
   // eventTree->Branch("OMTF_muon_n",	 &m_OMTF_muon_n);
   // eventTree->Branch("OMTF_muon_pt", 	 &m_OMTF_muon_pt);
@@ -356,11 +356,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     return;
   }
 
-  m_EMTF_muon_n->clear();
-  m_EMTF_muon_pt->clear();
-  m_EMTF_muon_eta->clear();
-  m_EMTF_muon_phi->clear();
-  m_EMTF_muon_c->clear();
+  // m_EMTF_muon_n->clear();
+  // m_EMTF_muon_pt->clear();
+  // m_EMTF_muon_eta->clear();
+  // m_EMTF_muon_phi->clear();
+  // m_EMTF_muon_c->clear();
 
   // m_OMTF_muon_n->clear();
   // m_OMTF_muon_pt->clear();
@@ -690,28 +690,28 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   if (DebugMode) cout << "Finished TP Iteration" << endl<< endl;
 
-  Handle< BXVector<l1t::RegionalMuonCand> > emtfs;
+  // Handle< BXVector<l1t::RegionalMuonCand> > emtfs;
   // Handle< BXVector<l1t::RegionalMuonCand> > omtfs;
   // Handle< BXVector<l1t::RegionalMuonCand> > bmtfs;
 
-  iEvent.getByToken(m_emtfToken,emtfs);
+  // iEvent.getByToken(m_emtfToken,emtfs);
   // iEvent.getByToken(m_omtfToken,omtfs);
   // iEvent.getByToken(m_bmtfToken,bmtfs);
 
-  int nEMTF=0;
-  for (auto it = emtfs->begin(0); it != emtfs->end(0); it++){
-    m_EMTF_muon_eta->push_back(it->hwEta()*0.010875);
-    int globPhi=l1t::MicroGMTConfiguration::calcGlobalPhi(it->hwPhi(), it->trackFinderType(), it->processor());
-    m_EMTF_muon_phi->push_back(globPhi*2*M_PI/576.);
-    m_EMTF_muon_pt->push_back(it->hwPt()*0.5);
-    if(!it->hwSignValid()) m_EMTF_muon_c->push_back(0);
-    else{
-      if(it->hwSign())   m_EMTF_muon_c->push_back(-1);
-      else 		   m_EMTF_muon_c->push_back(1);
-    }
-    ++nEMTF;
-  }
-  m_EMTF_muon_n->push_back(nEMTF);
+  // int nEMTF=0;
+  // for (auto it = emtfs->begin(0); it != emtfs->end(0); it++){
+  //   m_EMTF_muon_eta->push_back(it->hwEta()*0.010875);
+  //   int globPhi=l1t::MicroGMTConfiguration::calcGlobalPhi(it->hwPhi(), it->trackFinderType(), it->processor());
+  //   m_EMTF_muon_phi->push_back(globPhi*2*M_PI/576.);
+  //   m_EMTF_muon_pt->push_back(it->hwPt()*0.5);
+  //   if(!it->hwSignValid()) m_EMTF_muon_c->push_back(0);
+  //   else{
+  //     if(it->hwSign())   m_EMTF_muon_c->push_back(-1);
+  //     else 		   m_EMTF_muon_c->push_back(1);
+  //   }
+  //   ++nEMTF;
+  // }
+  // m_EMTF_muon_n->push_back(nEMTF);
 
   // int nOMTF=0;
   // for (auto it = omtfs->begin(0); it != omtfs->end(0); it++){

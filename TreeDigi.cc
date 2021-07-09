@@ -167,23 +167,26 @@ public:
       evttree->Branch(name+"_eventid",     &eventid);
       evttree->Branch(name+"_charge",      &charge);
     }
-  }
 
-  else if (data_type == 7) {
-    InitGP(evttree);
-    detId = new std::vector<int>;
-    pads = new std::vector<int>;
-    part = new std::vector<int>;
-    len = new std::vector<int>;
-    evttree->Branch(name+"_detId", &detId);
-    evttree->Branch(name+"_pads", &pads);
-    evttree->Branch(name+"_part", &part);
-    evttree->Branch(name+"_len",&len);
-    if (IsMatched) {
-      matchCSC = new std::vector<int>;
-      evttree->Branch(name+"_matchTp", &matchCSC);
+    // GEMPadDigiCluster
+    else if (data_type == 7) {
+      InitGP(evttree);
+      detId = new std::vector<int>;
+      pads = new std::vector<int>;
+      part = new std::vector<int>;
+      len = new std::vector<int>;
+      evttree->Branch(name+"_detId", &detId);
+      evttree->Branch(name+"_pads", &pads);
+      evttree->Branch(name+"_part", &part);
+      evttree->Branch(name+"_len",&len);
+      if (IsMatched) {
+        matchTp = new std::vector<int>;
+        evttree->Branch(name+"_matchTp", &matchTp);
+      }
     }
   }
+
+
 
   void Init(TTree* evttree, TString name_, TString data_type_st, bool match_ = false) {
     int data_type_ = -1;
@@ -194,7 +197,7 @@ public:
     else if (data_type_st == "GEMPad") data_type_ = 4;
     else if (data_type_st == "SimHit") data_type_ = 5;
     else if (data_type_st == "TP") data_type_ = 6;
-    else if (data_type_st == "GEMPadCluster") data_type_ = 7;
+    else if (data_type_st == "GEMPadDigiCluster") data_type_ = 7;
     // else if (data_type_st == "MatchMuon") data_type_ = 8;
 
 
@@ -376,7 +379,7 @@ public:
     matchTp->push_back(matchTp_);
   }
 
-  void FillGEMPadCluster(GEMPadDigiCluster cluster, int rawid, int tp_index) {
+  void FillGEMPadDigiCluster(GEMPadDigiCluster cluster, int rawid, int tp_index = -1) {
     // pad->insert(pad->end(), cluster.pads().begin(), cluster.pads().end());
     for (uint16_t pad_ : cluster.pads()) pads->push_back(pad_);
     pads->push_back(-1);

@@ -778,6 +778,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     bool doprintc = Print_allCscStubs && Print_CLCT;
     for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
       if (DebugMode) cout << " Started "<< digi_index << "th Digi for "<< allCscStubs_index << "th allCscStubsLCTs" <<endl;
+      if ((*itdigi).getQuality() == 6) cout << "Found a 6!" <<endl;
       auto gp = match->cscStubs()->getGlobalPosition(detid.rawId(), *itdigi);
       // auto gp2 = match->cscStubs()->getGlobalPosition2(detid.rawId(), *itdigi);
       // if (gp2.eta() != gp.eta() || gp2.phi() != gp.phi()) {
@@ -813,6 +814,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if (DebugMode) cout << " Finishing a allCscStub, starting allCscStub GEMPads" <<endl;
       if (detid.ring() == 1 and (detid.station() == 1 or detid.station() == 2)) {
         bool matchl1(false), matchl2(false);
+        if ((*itdigi).getGEM1().pad() != 255 || (*itdigi).getGEM2().pad() != 255 || (*itdigi).getGEM1().nPartitions() != 8 || (*itdigi).getGEM2().nPartitions() != 8) {
+          cout << "In station " << detid_.station() << " , ring " << detid_.ring() << endl;
+          cout << "GEM1 pad = " << (*itdigi).getGEM1().pad() << " , part = " << (*itdigi).getGEM1().nPartitions() <<endl;
+          cout << "GEM2 pad = " << (*itdigi).getGEM2().pad() << " , part = " << (*itdigi).getGEM2().nPartitions() <<endl;
+        }
         const GEMDetId gemDetIdL1(detid.zendcap(), 1, detid.station(), 1, detid.chamber(), 0);
         for (const auto& p : match->gemDigis()->padsInChamber(gemDetIdL1.rawId())) {
           if (p == (*itdigi).getGEM1()) {

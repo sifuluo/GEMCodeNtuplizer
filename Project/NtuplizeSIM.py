@@ -22,26 +22,26 @@ ifile = options.ifile
 datatag = options.dataset
 outputtag = options.outputtag
 IsRun4 = False
-TestNEvent = 200
+TestNEvent = -1
 
 IsLocal = False
 IsFullRun = True
 if ifile < 0:
-    IsLocal = True
+  IsLocal = True
 if ifile == -1:
-    IsFullRun = False
+  IsFullRun = False
 # ifile: >=0 number of file to process. -1: process 100 event local file. -2: process all local file.
 # print("process number: ", ifile)
 if ifile >=  0: print("Processing {}th file of dataset {}.".format(ifile,datatag))
-if ifile == -1: print("Testing " + str(TestNEvent) + " events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
+if ifile == -1: print("Testing " + str(TestNEvent) + " events of step1" + ("Run4" if IsRun4 else "Run3_pre2") + ".root")
 if ifile == -2: print("Testing all events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
 
 inputFile = ""
 with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
-    for i, line in enumerate(filenames):
-        if i == options.ifile:
-            inputFile = line
-            break
+  for i, line in enumerate(filenames):
+    if i == options.ifile:
+      inputFile = line
+      break
 inputFile = inputFile.strip('\n')
 
 # import of standard configurations
@@ -51,10 +51,10 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
 if IsRun4:
-    process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
-    process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
+  process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
+  process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
 else:
-    process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+  process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
@@ -62,7 +62,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 if not IsLocal:
-    process.MessageLogger.cerr.FwkReport.reportEvery = 100
+  process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 # process.MessageLogger.suppressWarning = cms.untracked.vstring('GEMRawToDigiModule')
 # process.MessageLogger.suppressWarning = cms.untracked.vstring("muonGEMDigis","simEmtfDigis")
@@ -70,50 +70,50 @@ if not IsLocal:
 # process.MessageLogger.cerr.threshold = cms.untracked.string('ERROR')
 
 process.maxEvents = cms.untracked.PSet(
-    # input = cms.untracked.int32(-1),
-    input = cms.untracked.int32(TestNEvent if not IsFullRun else -1),
-    output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
+  # input = cms.untracked.int32(-1),
+  input = cms.untracked.int32(TestNEvent if not IsFullRun else -1),
+  output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    # fileNames = cms.untracked.vstring(inputFile),
-    fileNames = cms.untracked.vstring(('file:step1' + ('Run4' if IsRun4 else 'Run3_pre2') + '.root') if IsLocal else inputFile),
-    secondaryFileNames = cms.untracked.vstring()
+  # fileNames = cms.untracked.vstring(inputFile),
+  fileNames = cms.untracked.vstring(('file:step1' + ('Run4' if IsRun4 else 'Run3_pre2') + '.root') if IsLocal else inputFile),
+  secondaryFileNames = cms.untracked.vstring()
 )
 
 process.options = cms.untracked.PSet(
-    FailPath = cms.untracked.vstring(),
-    IgnoreCompletely = cms.untracked.vstring(),
-    Rethrow = cms.untracked.vstring(),
-    SkipEvent = cms.untracked.vstring(),
-    allowUnscheduled = cms.obsolete.untracked.bool,
-    canDeleteEarly = cms.untracked.vstring(),
-    emptyRunLumiMode = cms.obsolete.untracked.string,
-    eventSetup = cms.untracked.PSet(
-        forceNumberOfConcurrentIOVs = cms.untracked.PSet(
+  FailPath = cms.untracked.vstring(),
+  IgnoreCompletely = cms.untracked.vstring(),
+  Rethrow = cms.untracked.vstring(),
+  SkipEvent = cms.untracked.vstring(),
+  allowUnscheduled = cms.obsolete.untracked.bool,
+  canDeleteEarly = cms.untracked.vstring(),
+  emptyRunLumiMode = cms.obsolete.untracked.string,
+  eventSetup = cms.untracked.PSet(
+    forceNumberOfConcurrentIOVs = cms.untracked.PSet(
 
-        ),
-        numberOfConcurrentIOVs = cms.untracked.uint32(1)
     ),
-    fileMode = cms.untracked.string('FULLMERGE'),
-    forceEventSetupCacheClearOnNewRun = cms.untracked.bool(False),
-    makeTriggerResults = cms.obsolete.untracked.bool,
-    numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
-    numberOfConcurrentRuns = cms.untracked.uint32(1),
-    numberOfStreams = cms.untracked.uint32(0),
-    numberOfThreads = cms.untracked.uint32(1),
-    printDependencies = cms.untracked.bool(False),
-    sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
-    throwIfIllegalParameter = cms.untracked.bool(True),
-    wantSummary = cms.untracked.bool(False)
+    numberOfConcurrentIOVs = cms.untracked.uint32(1)
+  ),
+  fileMode = cms.untracked.string('FULLMERGE'),
+  forceEventSetupCacheClearOnNewRun = cms.untracked.bool(False),
+  makeTriggerResults = cms.obsolete.untracked.bool,
+  numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
+  numberOfConcurrentRuns = cms.untracked.uint32(1),
+  numberOfStreams = cms.untracked.uint32(0),
+  numberOfThreads = cms.untracked.uint32(1),
+  printDependencies = cms.untracked.bool(False),
+  sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
+  throwIfIllegalParameter = cms.untracked.bool(True),
+  wantSummary = cms.untracked.bool(False)
 )
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step2bis.py nevts:10'),
-    name = cms.untracked.string('Applications'),
-    version = cms.untracked.string('$Revision: 1.19 $')
+  annotation = cms.untracked.string('step2bis.py nevts:10'),
+  name = cms.untracked.string('Applications'),
+  version = cms.untracked.string('$Revision: 1.19 $')
 )
 
 # # Output definition
@@ -135,37 +135,21 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '
 from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
 process = addCSCTriggerRun3(process)
 
+# process.SimL1Emulator = cms.Sequence(
+#   process.simMuonGEMPadDigis *
+#   process.simMuonGEMPadDigiClusters *
+#   #process.simCscTriggerPrimitiveDigis *
+#   process.simCscTriggerPrimitiveDigisILT
+#   #process.simCscTriggerPrimitiveDigisRun3CCLUT *
+#   #process.simCscTriggerPrimitiveDigisRun3CCLUTILT *
+#   #process.simEmtfDigis *
+#   #process.simEmtfDigisILT *
+#   #process.simEmtfDigisRun3CCLUT *
+#   #process.simEmtfDigisRun3CCLUTILT
+# )
+
 from GEMCode.GEMValidation.cscTriggerCustoms import runOn120XMC
 process = runOn120XMC(process)
-
-# process.GlobalTag.toGet = cms.VPSet(
-#     cms.PSet(record = cms.string("GEMeMapRcd"),
-#         tag = cms.string("GEMeMapFull"),
-#         connect = cms.string('sqlite_file:GEMeMap_Full.db')
-#         )
-# )
-# process.muonGEMDigis.useDBEMap = True
-# process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
-
-# customize unpacker
-# if IsRun4:
-#     process.muonGEMDigis.useDBEMap = False
-# else:
-#     # Work around for GEM in Run3 samples
-#     process.GlobalTag.toGet = cms.VPSet(
-#     cms.PSet(record = cms.string("GEMeMapRcd"),
-#     tag = cms.string("GEMeMapDummy"),
-#     connect = cms.string("sqlite_file:GEMeMapDummy.db")))
-#     process.muonGEMDigis.useDBEMap = True
-# This part has been incorporated in runOn120XMC()
-
-# process.SimL1Emulator = cms.Sequence(
-#     process.simMuonGEMPadDigis *
-#     process.simMuonGEMPadDigiClusters *
-#     process.simCscTriggerPrimitiveDigis *
-#     process.simCscTriggerPrimitiveDigisRun3CCLUT *
-#     process.simEmtfDigis)
-# process.simMuonGEMPadDigis.InputCollection = "muonGEMDigis"
 
 process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
 
@@ -214,37 +198,38 @@ ana.cscALCT.maxBX = 4
 ana.cscCLCT.verbose = 0
 ana.cscCLCT.minBX = 6
 ana.cscCLCT.maxBX = 8
-ana.cscLCT.verbose = 1
+ana.cscLCT.verbose = 0
 # ana.cscLCT.addGhostLCTs = cms.bool(True)
 ana.cscLCT.addGhosts = cms.bool(True)
-ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
+ana.cscLCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigis","","ReL1")
+# ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
 ana.gemStripDigi = cms.PSet(
-    verbose = cms.int32(0),
-    # inputTag = cms.InputTag("muonGEMDigis"),
-    inputTag = cms.InputTag("simMuonGEMDigis" if IsRun4 else "muonGEMDigis"),
-    minBX = cms.int32(-1),
-    maxBX = cms.int32(1),
-    matchDeltaStrip = cms.int32(1),
-    matchToSimLink = cms.bool(False)
+  verbose = cms.int32(0),
+  # inputTag = cms.InputTag("muonGEMDigis"),
+  inputTag = cms.InputTag("simMuonGEMDigis" if IsRun4 else "muonGEMDigis"),
+  minBX = cms.int32(-1),
+  maxBX = cms.int32(1),
+  matchDeltaStrip = cms.int32(1),
+  matchToSimLink = cms.bool(False)
 )
 # ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
 process.ana = cms.Path(ana)
 
 
 # Path and EndPath definitions
-process.raw2digi_step = cms.Path(process.RawToDigi)
-# process.muonGEMDigis_step = cms.Path(process.muonGEMDigis)
+# process.raw2digi_step = cms.Path(process.RawToDigi)
+process.muonGEMDigis_step = cms.Path(process.muonGEMDigis)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 # process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 
 # Schedule definition
 if IsRun4:
-    process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
+  process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
 else:
-    # process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
-    process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
-    # process.schedule = cms.Schedule(process.raw2digi_step,process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
+  process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
+  # process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
+  # process.schedule = cms.Schedule(process.raw2digi_step,process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
 # process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step,process.FEVTDEBUGoutput_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)

@@ -368,7 +368,7 @@ public:
   }
 
   void FillGEMPad0(int rawid, int csc_index = -1) {
-    pad->push_back(0);
+    pad->push_back(255);
     part->push_back(0);
     detId->push_back(rawid);
     if (csc_index != -1) matchCSC->push_back(csc_index);

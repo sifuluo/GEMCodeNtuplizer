@@ -169,6 +169,22 @@ public:
     }
   }
 
+  else if (data_type == 7) {
+    InitGP(evttree);
+    detId = new std::vector<int>;
+    pads = new std::vector<int>;
+    part = new std::vector<int>;
+    len = new std::vector<int>;
+    evttree->Branch(name+"_detId", &detId);
+    evttree->Branch(name+"_pads", &pads);
+    evttree->Branch(name+"_part", &part);
+    evttree->Branch(name+"_len",&len);
+    if (IsMatched) {
+      matchCSC = new std::vector<int>;
+      evttree->Branch(name+"_matchTp", &matchCSC);
+    }
+  }
+
   void Init(TTree* evttree, TString name_, TString data_type_st, bool match_ = false) {
     int data_type_ = -1;
     if (data_type_st == "LCT") data_type_ = 0;
@@ -178,7 +194,7 @@ public:
     else if (data_type_st == "GEMPad") data_type_ = 4;
     else if (data_type_st == "SimHit") data_type_ = 5;
     else if (data_type_st == "TP") data_type_ = 6;
-    // else if (data_type_st == "RegionalMuon") data_type_ = 7;
+    else if (data_type_st == "GEMPadCluster") data_type_ = 7;
     // else if (data_type_st == "MatchMuon") data_type_ = 8;
 
 
@@ -259,6 +275,16 @@ public:
       eventid->clear();
       charge->clear();
     }
+    else if (data_type == 7) {
+      ResetGP();
+      detId->clear();
+      pads->clear();
+      part->clear();
+      len->clear();
+      if (IsMatched) {
+        matchTp->clear();
+      }
+    }
   }
 
   void ResetGP() {
@@ -303,7 +329,6 @@ public:
     strip8->push_back(lct.getFractionalStrip(8));
     valid->push_back(lct.isValid());
     type->push_back(lct.getType());
-
     detId->push_back(rawid);
     if (tp_index != -1) matchTp->push_back(tp_index);
   }
@@ -311,7 +336,6 @@ public:
   void FillALCT(CSCALCTDigi alct, int rawid, int tp_index = -1) {
     keywire->push_back(alct.getKeyWG());
     valid->push_back(alct.isValid());
-
     detId->push_back(rawid);
     if (tp_index != -1) matchTp->push_back(tp_index);
   }
@@ -323,7 +347,6 @@ public:
     bend->push_back(clct.getBend());
     pattern->push_back(clct.getRun3Pattern());
     slope->push_back(clct.getSlope());
-
     detId->push_back(rawid);
     if (tp_index != -1) matchTp->push_back(tp_index);
   }
@@ -351,6 +374,16 @@ public:
   void FillSimHit(int station_, int matchTp_) {
     station->push_back(station_);
     matchTp->push_back(matchTp_);
+  }
+
+  void FillGEMPadCluster(GEMPadDigiCluster cluster, int rawid, int tp_index) {
+    // pad->insert(pad->end(), cluster.pads().begin(), cluster.pads().end());
+    for (uint16_t pad_ : cluster.pads()) pads->push_back(pad_);
+    pads->push_back(-1);
+    len->push_back(cluster.pads().size());
+    part->push_back(cluster.nPartitions());
+    detId->push_back(rawid);
+    if (tp_index != -1) matchTp->push_back(tp_index);
   }
 
   void FillDetId(int rawid) {
@@ -386,6 +419,8 @@ public:
   std::vector<int>*   type;
   std::vector<int>*   part;
   std::vector<int>*   pad;
+  std::vector<int>*   pads;
+  std::vector<int>*   len;
 
   //SimHit
   std::vector<int>* station;

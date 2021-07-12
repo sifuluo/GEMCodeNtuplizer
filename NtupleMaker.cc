@@ -408,6 +408,8 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   allCscGEM1->Reset();
   allCscGEM2->Reset();
   gemPadDigi->Reset();
+  matchGemPadDigiCluster->Reset();
+  allGemPadDigiCluster->Reset();
 
   if (DebugMode) cout << "Finished branch initialization" << endl;
 
@@ -815,7 +817,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if (detid.ring() == 1 and (detid.station() == 1 or detid.station() == 2)) {
         bool matchl1(false), matchl2(false);
         if ((*itdigi).getGEM1().pad() != 255 || (*itdigi).getGEM2().pad() != 255 || (*itdigi).getGEM1().nPartitions() != 8 || (*itdigi).getGEM2().nPartitions() != 8) {
-          cout << "In station " << detid_.station() << " , ring " << detid_.ring() << endl;
+          cout << "In station " << detid.station() << " , ring " << detid.ring() << endl;
           cout << "GEM1 pad = " << (*itdigi).getGEM1().pad() << " , part = " << (*itdigi).getGEM1().nPartitions() <<endl;
           cout << "GEM2 pad = " << (*itdigi).getGEM2().pad() << " , part = " << (*itdigi).getGEM2().nPartitions() <<endl;
         }
@@ -960,7 +962,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
   if (DebugMode) cout << "Finished GEMPadDigis, started GEMPadDigiClusters" <<endl;
 
-  // GEMPadDigiClusters
+  // GEMPadDigiCluster
   edm::Handle<GEMPadDigiClusterCollection> gemPadDigiClustersH_;
   iEvent.getByToken(gemPadDigiClusterToken_,gemPadDigiClustersH_);
   const GEMPadDigiClusterCollection& cls = *gemPadDigiClustersH_.product();

@@ -382,7 +382,7 @@ public:
   void FillGEMPadDigiCluster(GEMPadDigiCluster cluster, int rawid, int tp_index = -1) {
     // pad->insert(pad->end(), cluster.pads().begin(), cluster.pads().end());
     for (uint16_t pad_ : cluster.pads()) pads->push_back(pad_);
-    pads->push_back(-1);
+    // pads->push_back(-1);
     len->push_back(cluster.pads().size());
     part->push_back(cluster.nPartitions());
     detId->push_back(rawid);
@@ -441,7 +441,6 @@ public:
   std::vector<int>* nstub;
   std::vector<int>* eventid;
   std::vector<int>* charge;
-
 
 private:
   TString name;

@@ -23,7 +23,7 @@ print("process number: ", ifile)
     # quit()
 # ifile = resublist[ifile]
 inputFile = ""
-with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/Run4/RVSMPt10noPU.txt") as filenames:
+with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/CMSSW12/RVSMPt10.txt") as filenames:
     for i, line in enumerate(filenames):
         if i == options.ifile:
             inputFile = line
@@ -162,7 +162,7 @@ ana.gemStripDigi = cms.PSet(
     matchDeltaStrip = cms.int32(1),
     matchToSimLink = cms.bool(False)
 )
-ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
+# ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
 process.ana = cms.Path(ana)
 
 # from GEMCode.GEMValidation.cscTriggerCustoms import runOn110XMC

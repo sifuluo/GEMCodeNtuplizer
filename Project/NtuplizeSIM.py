@@ -15,7 +15,7 @@ process = cms.Process('ReL1',Run3)
 
 options = VarParsing.VarParsing ('standard')
 options.register('ifile', -1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "input file index")
-options.register('dataset', "CMSSW12/RVSMPt10", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "input dataset name")
+options.register('dataset', "CMSSW12/Run3/RVSMPt10", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "input dataset name")
 options.register('outputtag', "ME1/RVSMPt1000noPU", VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "output folder name")
 options.parseArguments()
 ifile = options.ifile
@@ -33,7 +33,7 @@ if ifile == -1:
 # ifile: >=0 number of file to process. -1: process 100 event local file. -2: process all local file.
 # print("process number: ", ifile)
 if ifile >=  0: print("Processing {}th file of dataset {}.".format(ifile,datatag))
-if ifile == -1: print("Testing " + str(TestNEvent) + " events of step1" + ("Run4" if IsRun4 else "Run3_pre2") + ".root")
+if ifile == -1: print("Testing " + str(TestNEvent) + " events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
 if ifile == -2: print("Testing all events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
 
 inputFile = ""
@@ -51,8 +51,8 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
 if IsRun4:
-  process.load('Configuration.Geometry.GeometryExtended2026D49Reco_cff')
-  process.load('Configuration.Geometry.GeometryExtended2026D49_cff')
+  process.load('Configuration.Geometry.GeometryExtended2026D76Reco_cff')
+  process.load('Configuration.Geometry.GeometryExtended2026D76_cff')
 else:
   process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
@@ -67,6 +67,8 @@ if not IsLocal:
 # process.MessageLogger.suppressWarning = cms.untracked.vstring('GEMRawToDigiModule')
 # process.MessageLogger.suppressWarning = cms.untracked.vstring("muonGEMDigis","simEmtfDigis")
 # process.MessageLogger.suppressError = cms.untracked.vstring("simCscTriggerPrimitiveDigisRun3CCLUTILT")
+# process.MessageLogger.suppressError = cms.untracked.vstring("simCscTriggerPrimitiveDigisRun3CCLUT")
+# process.MessageLogger.suppressError = cms.untracked.vstring("simCscTriggerPrimitiveDigis")
 # process.MessageLogger.cerr.threshold = cms.untracked.string('ERROR')
 
 process.maxEvents = cms.untracked.PSet(
@@ -78,7 +80,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
   # fileNames = cms.untracked.vstring(inputFile),
-  fileNames = cms.untracked.vstring(('file:step1' + ('Run4' if IsRun4 else 'Run3_pre2') + '.root') if IsLocal else inputFile),
+  fileNames = cms.untracked.vstring(('file:step1' + ('Run4' if IsRun4 else 'Run3') + '.root') if IsLocal else inputFile),
   secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -201,7 +203,7 @@ ana.cscCLCT.maxBX = 8
 ana.cscLCT.verbose = 0
 # ana.cscLCT.addGhostLCTs = cms.bool(True)
 ana.cscLCT.addGhosts = cms.bool(True)
-ana.cscLCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigis","","ReL1")
+ana.cscLCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","","ReL1")
 # ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
 ana.gemStripDigi = cms.PSet(
   verbose = cms.int32(0),
@@ -223,11 +225,12 @@ process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 # process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 
+process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
 # Schedule definition
-if IsRun4:
-  process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
-else:
-  process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
+# if IsRun4:
+#   process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
+# else:
+#   process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
   # process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
   # process.schedule = cms.Schedule(process.raw2digi_step,process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
 # process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step,process.FEVTDEBUGoutput_step)

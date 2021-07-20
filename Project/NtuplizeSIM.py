@@ -24,7 +24,7 @@ outputtag = options.outputtag
 IsRun4 = False
 TestNEvent = -1
 
-IsLocal = False
+IsLocal = True
 IsFullRun = True
 if ifile < 0:
   IsLocal = True
@@ -37,7 +37,7 @@ if ifile == -1: print("Testing " + str(TestNEvent) + " events of step1" + ("Run4
 if ifile == -2: print("Testing all events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
 
 inputFile = ""
-if IsLocal:
+if not IsLocal:
   with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
     for i, line in enumerate(filenames):
       if i == options.ifile:

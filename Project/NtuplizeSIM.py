@@ -37,11 +37,12 @@ if ifile == -1: print("Testing " + str(TestNEvent) + " events of step1" + ("Run4
 if ifile == -2: print("Testing all events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
 
 inputFile = ""
-with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
-  for i, line in enumerate(filenames):
-    if i == options.ifile:
-      inputFile = line
-      break
+if IsLocal:
+  with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
+    for i, line in enumerate(filenames):
+      if i == options.ifile:
+        inputFile = line
+        break
 inputFile = inputFile.strip('\n')
 
 # import of standard configurations

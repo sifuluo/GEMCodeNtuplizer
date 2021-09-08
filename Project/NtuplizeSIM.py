@@ -3,15 +3,11 @@
 # Revision: 1.19
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v
 # with command line options: step2bis.py --filein file:step3.root --fileout file:step2bis.root --mc --eventcontent FEVTDEBUG --datatier GEN-SIM-DIGI-L1 --conditions auto:phase1_2021_realistic --step L1 --geometry DB:Extended --era Run3 --python_filename step2bis_L1.py --no_exec -n 10
-import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Era_Run3_cff import Run3
 
 import os
 import sys
 import FWCore.ParameterSet.VarParsing as VarParsing
-
-process = cms.Process('ReL1',Run3)
 
 options = VarParsing.VarParsing ('standard')
 options.register('ifile', -1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, "input file index")
@@ -21,29 +17,46 @@ options.parseArguments()
 ifile = options.ifile
 datatag = options.dataset
 outputtag = options.outputtag
-IsRun4 = False
-TestNEvent = -1
-
-IsLocal = True
+IsRun4 = True
+TestNEvent = 100
+IsPrivate = False
+IsLocal = False
 IsFullRun = True
 if ifile < 0:
   IsLocal = True
 if ifile == -1:
   IsFullRun = False
+if IsPrivate:
+  IsRun4 = True
 # ifile: >=0 number of file to process. -1: process 100 event local file. -2: process all local file.
 # print("process number: ", ifile)
-if ifile >=  0: print("Processing {}th file of dataset {}.".format(ifile,datatag))
-if ifile == -1: print("Testing " + str(TestNEvent) + " events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
-if ifile == -2: print("Testing all events of step1" + ("Run4" if IsRun4 else "Run3") + ".root")
 
 inputFile = ""
-if not IsLocal:
+outputname = ""
+if IsLocal:
+  inputFile = 'file:' + ('Private' if IsPrivate else 'step1') + ('Run4' if IsRun4 else 'Run3') + '.root'
+  outputname = 'out/' + ('Private_' if IsPrivate else 'out_') + ('Run4' if IsRun4 else 'Run3') + '.root'
+else:
   with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
     for i, line in enumerate(filenames):
       if i == options.ifile:
         inputFile = line
+        inputFile = inputFile.strip('\n')
         break
-inputFile = inputFile.strip('\n')
+  outputname = '/eos/user/s/siluo/Muon/'+outputtag+'/InProgress/out_'+str(ifile)+'.root'
+
+if ifile >=  0: print("Processing {}th file of dataset {}.".format(ifile,datatag))
+if ifile == -1: print("Testing " + str(TestNEvent) + " events of " + inputFile)
+if ifile == -2: print("Testing all events of " + inputFile)
+
+import FWCore.ParameterSet.Config as cms
+
+if IsRun4:
+  from Configuration.Eras.Era_Phase2C11I13M9_cff import Phase2C11I13M9
+  process = cms.Process('ReL1',Phase2C11I13M9)
+else:
+  from Configuration.Eras.Era_Run3_cff import Run3
+  process = cms.Process('ReL1',Run3)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -80,8 +93,8 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-  # fileNames = cms.untracked.vstring(inputFile),
-  fileNames = cms.untracked.vstring(('file:step1' + ('Run4' if IsRun4 else 'Run3') + '.root') if IsLocal else inputFile),
+  fileNames = cms.untracked.vstring(inputFile),
+  # fileNames = cms.untracked.vstring(('file:step1' + ('Run4' if IsRun4 else 'Run3') + '.root') if IsLocal else inputFile),
   secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -121,46 +134,36 @@ process.configurationMetadata = cms.untracked.PSet(
 
 # # Output definition
 #
-# process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
-#     dataset = cms.untracked.PSet(
-#         dataTier = cms.untracked.string('GEN-SIM-DIGI-L1'),
-#         filterName = cms.untracked.string('')
-#     ),
-#     fileName = cms.untracked.string('file:out/out.root'),
-#     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
-#     splitLevel = cms.untracked.int32(0)
-# )
+process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
+    dataset = cms.untracked.PSet(
+        dataTier = cms.untracked.string('GEN-SIM-DIGI-L1'),
+        filterName = cms.untracked.string('')
+    ),
+    fileName = cms.untracked.string('file:out/out.root'),
+    outputCommands = process.FEVTDEBUGEventContent.outputCommands,
+    splitLevel = cms.untracked.int32(0)
+)
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+if IsRun4:
+  # process.GlobalTag = GlobalTag(process.GlobalTag, '113X_mcRun4_realistic_v7', '')
+  process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+else:
+  process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+
 
 from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
 process = addCSCTriggerRun3(process)
 
-# process.SimL1Emulator = cms.Sequence(
-#   process.simMuonGEMPadDigis *
-#   process.simMuonGEMPadDigiClusters *
-#   #process.simCscTriggerPrimitiveDigis *
-#   process.simCscTriggerPrimitiveDigisILT
-#   #process.simCscTriggerPrimitiveDigisRun3CCLUT *
-#   #process.simCscTriggerPrimitiveDigisRun3CCLUTILT *
-#   #process.simEmtfDigis *
-#   #process.simEmtfDigisILT *
-#   #process.simEmtfDigisRun3CCLUT *
-#   #process.simEmtfDigisRun3CCLUTILT
-# )
-
 from GEMCode.GEMValidation.cscTriggerCustoms import runOn120XMC
 process = runOn120XMC(process)
-
+if IsRun4:
+  process.muonGEMDigis.useDBEMap = False
+  # process.muonGEMDigis.readMultiBX = True
 process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
 
 # NtupleMaker
-outputname = ('out/out_Run4.root' if IsRun4 else 'out/out_Run3.root') if IsLocal else '/eos/user/s/siluo/Muon/'+outputtag+'/InProgress/out_'+str(ifile)+'.root'
-# process.TFileService = cms.Service("TFileService", fileName = cms.string('/eos/user/s/siluo/Muon/'+datatag+'/InProgress/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
-# process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out.root'), closeFileFast = cms.untracked.bool(True))
-# process.TFileService = cms.Service("TFileService", fileName = cms.string('out/out_'+str(ifile)+'.root'), closeFileFast = cms.untracked.bool(True))
 process.TFileService = cms.Service("TFileService", fileName = cms.string(outputname), closeFileFast = cms.untracked.bool(True))
 
 from GEMCode.GEMValidation.simTrackMatching_cfi import simTrackPSet
@@ -203,8 +206,10 @@ ana.cscCLCT.minBX = 6
 ana.cscCLCT.maxBX = 8
 ana.cscLCT.verbose = 0
 # ana.cscLCT.addGhostLCTs = cms.bool(True)
-ana.cscLCT.addGhosts = cms.bool(True)
+# ana.cscLCT.addGhosts = cms.bool(True)
 ana.cscLCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","","ReL1")
+ana.cscCLCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","","ReL1")
+ana.cscALCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","","ReL1")
 # ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
 ana.gemStripDigi = cms.PSet(
   verbose = cms.int32(0),
@@ -220,7 +225,7 @@ process.ana = cms.Path(ana)
 
 
 # Path and EndPath definitions
-# process.raw2digi_step = cms.Path(process.RawToDigi)
+process.raw2digi_step = cms.Path(process.RawToDigi)
 process.muonGEMDigis_step = cms.Path(process.muonGEMDigis)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.endjob_step = cms.EndPath(process.endOfProcess)
@@ -232,9 +237,7 @@ process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_s
 #   process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
 # else:
 #   process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
-  # process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)
-  # process.schedule = cms.Schedule(process.raw2digi_step,process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
-# process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step,process.FEVTDEBUGoutput_step)
+
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 

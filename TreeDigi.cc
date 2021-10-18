@@ -45,6 +45,10 @@ public:
       strip8 = new std::vector<int>;
       valid = new std::vector<bool>;
       type = new std::vector<int>;
+      GEM1pad = new std::vector<int>;
+      GEM1part = new std::vector<int>;
+      GEM2pad = new std::vector<int>;
+      GEM2part = new std::vector<int>;
       evttree->Branch(name+"_bend", &bend);
       evttree->Branch(name+"_pattern", &pattern);
       evttree->Branch(name+"_slope", &slope);
@@ -55,6 +59,10 @@ public:
       evttree->Branch(name+"_strip8", &strip8);
       evttree->Branch(name+"_valid", &valid);
       evttree->Branch(name+"_type", &type);
+      evttree->Branch(name+"_GEM1pad", &GEM1pad);
+      evttree->Branch(name+"_GEM1part", &GEM1part);
+      evttree->Branch(name+"_GEM2pad", &GEM2pad);
+      evttree->Branch(name+"_GEM2part", &GEM2part);
       if (IsMatched) {
         matchTp = new std::vector<int>;
         evttree->Branch(name+"_matchTp", &matchTp);
@@ -218,6 +226,10 @@ public:
       strip8->clear();
       valid->clear();
       type->clear();
+      GEM1pad->clear();
+      GEM1part->clear();
+      GEM2pad->clear();
+      GEM2part->clear();
       if (IsMatched) {
         matchTp->clear();
       }
@@ -326,6 +338,7 @@ public:
     bend->push_back(lct.getBend());
     pattern->push_back(lct.getRun3Pattern());
     slope->push_back(lct.getSlope());
+    // cout << "lct reads slope as " << lct.getSlope()<<endl;
     quality->push_back(lct.getQuality());
     keywire->push_back(lct.getKeyWG());
     strip->push_back(lct.getStrip());
@@ -333,6 +346,11 @@ public:
     valid->push_back(lct.isValid());
     type->push_back(lct.getType());
     detId->push_back(rawid);
+    GEM1pad->push_back(lct.getGEM1().pad());
+    GEM1part->push_back(lct.getGEM1().nPartitions());
+    GEM2pad->push_back(lct.getGEM2().pad());
+    GEM2part->push_back(lct.getGEM2().nPartitions());
+    // cout << "GEMs has been stored with pad = " << lct.getGEM1().pad() << " , " << lct.getGEM2().pad() <<endl;
     if (tp_index != -1) matchTp->push_back(tp_index);
   }
 
@@ -420,6 +438,10 @@ public:
   std::vector<int>*   strip8;
   std::vector<bool>*  valid;
   std::vector<int>*   type;
+  std::vector<int>*   GEM1pad;
+  std::vector<int>*   GEM1part;
+  std::vector<int>*   GEM2pad;
+  std::vector<int>*   GEM2part;
   std::vector<int>*   part;
   std::vector<int>*   pad;
   std::vector<int>*   pads;

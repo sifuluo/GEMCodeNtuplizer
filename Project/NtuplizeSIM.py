@@ -19,7 +19,7 @@ datatag = options.dataset
 outputtag = options.outputtag
 IsRun4 = True
 TestNEvent = 100
-IsPrivate = False
+IsPrivate = True
 IsLocal = False
 IsFullRun = True
 if ifile < 0:
@@ -28,14 +28,27 @@ if ifile == -1:
   IsFullRun = False
 if IsPrivate:
   IsRun4 = True
+  IsLocal = True
+  if ifile < 0:
+    ifile = 0
+
+ChangeAlgo = False
+B_matchWithHS = True
+B_assignGEMCSCBending = False
+B_migitageSlopeByCosi = True
 # ifile: >=0 number of file to process. -1: process 100 event local file. -2: process all local file.
 # print("process number: ", ifile)
 
 inputFile = ""
 outputname = ""
 if IsLocal:
-  inputFile = 'file:' + ('Private' if IsPrivate else 'step1') + ('Run4' if IsRun4 else 'Run3') + '.root'
-  outputname = 'out/' + ('Private_' if IsPrivate else 'out_') + ('Run4' if IsRun4 else 'Run3') + '.root'
+  if IsPrivate:
+    inputFile = 'file:Privatea/0/step2_' + str(ifile) + '.root'
+    outputname = 'out/Privatea_Run4_' + str(ifile) + '.root'
+  else:
+    inputFile = 'file:' + 'step1' + ('Run4' if IsRun4 else 'Run3') + '.root'
+    outputname = 'out/' + 'out_'  + ('Run4' if IsRun4 else 'Run3') + '.root'
+
 else:
   with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
     for i, line in enumerate(filenames):
@@ -45,7 +58,8 @@ else:
         break
   outputname = '/eos/user/s/siluo/Muon/'+outputtag+'/InProgress/out_'+str(ifile)+'.root'
 
-if ifile >=  0: print("Processing {}th file of dataset {}.".format(ifile,datatag))
+if ifile >= 0 and not IsLocal: print("Processing {}th file of dataset {}.".format(ifile,datatag))
+if IsPrivate: print("Processing {}th file of Private dataset".format(ifile))
 if ifile == -1: print("Testing " + str(TestNEvent) + " events of " + inputFile)
 if ifile == -2: print("Testing all events of " + inputFile)
 
@@ -152,15 +166,28 @@ if IsRun4:
 else:
   process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
 
+if ChangeAlgo:
+  process.simCscTriggerPrimitiveDigis.tmbPhase2GE11.matchWithHS = cms.bool(B_matchWithHS)
+  process.simCscTriggerPrimitiveDigis.tmbPhase2GE21.matchWithHS = cms.bool(B_matchWithHS)
+  process.simCscTriggerPrimitiveDigis.tmbPhase2GE11.assignGEMCSCBending = cms.bool(B_assignGEMCSCBending)
+  process.simCscTriggerPrimitiveDigis.tmbPhase2GE21.assignGEMCSCBending = cms.bool(B_assignGEMCSCBending)
+  process.simCscTriggerPrimitiveDigis.tmbPhase2GE11.mitigateSlopeByCosi = cms.bool(B_migitageSlopeByCosi)
+  process.simCscTriggerPrimitiveDigis.tmbPhase2GE21.mitigateSlopeByCosi = cms.bool(B_migitageSlopeByCosi)
+
 
 from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
 process = addCSCTriggerRun3(process)
 
 from GEMCode.GEMValidation.cscTriggerCustoms import runOn120XMC
-process = runOn120XMC(process)
-if IsRun4:
-  process.muonGEMDigis.useDBEMap = False
-  # process.muonGEMDigis.readMultiBX = True
+if not IsRun4:
+  process = runOn120XMC(process)
+
+
+
+# if IsRun4:
+#   process.muonGEMDigis.useDBEMap = False
+#   process.simMuonGEMPadDigis.InputCollection = "simMuonGEMDigis"
+#   # process.muonGEMDigis.readMultiBX = True
 process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
 
 # NtupleMaker
@@ -207,9 +234,10 @@ ana.cscCLCT.maxBX = 8
 ana.cscLCT.verbose = 0
 # ana.cscLCT.addGhostLCTs = cms.bool(True)
 # ana.cscLCT.addGhosts = cms.bool(True)
-ana.cscLCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","","ReL1")
-ana.cscCLCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","","ReL1")
-ana.cscALCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","","ReL1")
+ana.cscLCT.inputTag   = cms.InputTag("simCscTriggerPrimitiveDigisRun3CCLUTILT","","ReL1")
+ana.cscCLCT.inputTag  = cms.InputTag("simCscTriggerPrimitiveDigisRun3CCLUTILT","","ReL1")
+ana.cscALCT.inputTag  = cms.InputTag("simCscTriggerPrimitiveDigisRun3CCLUTILT","","ReL1")
+ana.cscMPLCT.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisRun3CCLUTILT","MPCSORTED","ReL1")
 # ana.muon.inputTag = cms.InputTag("gmtStage2Digis","Muon")
 ana.gemStripDigi = cms.PSet(
   verbose = cms.int32(0),
@@ -220,9 +248,10 @@ ana.gemStripDigi = cms.PSet(
   matchDeltaStrip = cms.int32(1),
   matchToSimLink = cms.bool(False)
 )
-# ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigisILT","")
+# ana.gemCoPadDigi.inputTag = cms.InputTag("simCscTriggerPrimitiveDigis","")
 process.ana = cms.Path(ana)
 
+# process.tmbPhase2GE11.matchWithHS = cms.bool(False)
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
@@ -232,6 +261,7 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 # process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 
 process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
+# process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.endjob_step)
 # Schedule definition
 # if IsRun4:
 #   process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)

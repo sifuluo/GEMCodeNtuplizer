@@ -227,6 +227,7 @@ public:
       part = new std::vector<int>;
       len = new std::vector<int>;
       evttree->Branch(name+"_pads", &pads);
+      evttree->Branch(name+"_pad", &pad);
       evttree->Branch(name+"_strip", &strip);
       evttree->Branch(name+"_strip8", &strip8);
       evttree->Branch(name+"_strip_me1a", &strip_me1a);
@@ -505,7 +506,7 @@ public:
   }
 
   void FillLCTGEMPads0(CSCCorrelatedLCTDigi lct){
-    GEM1pad->push_back(lct.getGEM1().pad());
+    GEM1pad->push_back(255);
     GEM1strip->push_back(-1);
     GEM1strip8->push_back(-1);
     GEM1strip_me1a->push_back(-1);
@@ -513,8 +514,8 @@ public:
     GEM1keywire_min->push_back(-1);
     GEM1keywire_max->push_back(-1);
     GEM1roll->push_back(-1);
-    GEM1part->push_back(lct.getGEM1().nPartitions());
-    GEM2pad->push_back(lct.getGEM2().pad());
+    GEM1part->push_back(0);
+    GEM2pad->push_back(255);
     GEM2strip->push_back(-1);
     GEM2strip8->push_back(-1);
     GEM2strip_me1a->push_back(-1);
@@ -522,7 +523,7 @@ public:
     GEM2keywire_min->push_back(-1);
     GEM2keywire_max->push_back(-1);
     GEM2roll->push_back(-1);
-    GEM2part->push_back(lct.getGEM2().nPartitions());
+    GEM2part->push_back(0);
   }
 
   void FillALCT(CSCALCTDigi alct, CSCDetId id, int tp_index = -1) {

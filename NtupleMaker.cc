@@ -227,7 +227,6 @@ config(iConfig)
 
   const auto& P_cscLCT = iConfig.getParameter<edm::ParameterSet>("cscLCT");
   lctToken_ = consumes<CSCCorrelatedLCTDigiCollection>(P_cscLCT.getParameter<edm::InputTag>("inputTag"));
-  cout <<endl<< P_cscLCT <<endl;
 
   const auto& P_cscALCT = iConfig.getParameter<edm::ParameterSet>("cscALCT");
   alctToken_ = consumes<CSCALCTDigiCollection>(P_cscALCT.getParameter<edm::InputTag>("inputTag"));
@@ -650,7 +649,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             bool matchl1(false), matchl2(false), printgem(false);
             GEMDetId PadGemDetId(detid_.zendcap(), 1, detid_.station(), 1, detid_.chamber(), 0);
             if (digi_.getGEM1().pad() != 255 || digi_.getGEM2().pad() != 255 || digi_.getGEM1().nPartitions() != 8 || digi_.getGEM2().nPartitions() != 8) {
-              if (DebugMode || true) {
+              if (DebugMode) {
                 printgem = true;
                 cout << "In station " << detid_.station() << " , ring " << detid_.ring() << " , eta = " << gp.eta() << " , matchCscStubsLCT rawId: " <<detid_.rawId() << endl;
               }
@@ -717,6 +716,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       // matchGemPadDigi
       const auto& detIdsPad = gemDigis_->detIdsPad();
       for (const auto& id : detIdsPad) {
+        GEMDetId gemid(id);
         for (auto pad : gemDigis_->padsInDetId(id)) {
           auto gp = gemDigis_->getGlobalPointPad(id, pad);
           matchGemPadDigi->FillGP(gp);
@@ -851,7 +851,7 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         bool matchl1(false), matchl2(false), printgem(false);
         GEMDetId PadGemDetId(detid.zendcap(), 1, detid.station(), 1, detid.chamber(), 0);
         if ((*itdigi).getGEM1().pad() != 255 || (*itdigi).getGEM2().pad() != 255 || (*itdigi).getGEM1().nPartitions() != 8 || (*itdigi).getGEM2().nPartitions() != 8) {
-          if (DebugMode || true) {
+          if (DebugMode) {
             printgem = true;
             cout << "In station " << detid.station() << " , ring " << detid.ring() << " , eta = " << gp.eta() << " ,  allCscStubsLCT rawId: " << detid.rawId() << endl;
           }
@@ -980,18 +980,17 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       auto gp = match->gemDigis()->getGlobalPointPad(detid, *itdigi);
       allGemPadDigi->FillGP(gp);
       allGemPadDigi->FillGEMPad(*itdigi, detid, -1, "");
-      if (detid.station() > 2) cout << "Station > 2" <<endl;
       gemPadPads[detid.station()].push_back((*itdigi).pad());
     }
   }
-  cout << "For all pads, In ME0, GE11, GE21: " << gemPadPads[0].size() << ", "<< gemPadPads[1].size() << ", "<< gemPadPads[2].size() << endl;
-  for (unsigned itdet = 0; itdet < 3; ++itdet) {
+  if (DebugMode) cout << "For all pads, In ME0, GE11, GE21: " << gemPadPads[0].size() << ", "<< gemPadPads[1].size() << ", "<< gemPadPads[2].size() << endl;
+  if (DebugMode) for (unsigned itdet = 0; itdet < 3; ++itdet) {
     cout << "(";
     for (unsigned itpad = 0; itpad < gemPadPads[itdet].size(); ++itpad) cout << gemPadPads[itdet][itpad] << ", ";
     cout << "),";
     cout << endl;
   }
-  cout <<endl;
+  if (DebugMode)cout <<endl;
   if (DebugMode) cout << "Finished GEMPadDigis, started GEMPadDigiClusters" <<endl;
 
   // GEMPadDigiCluster

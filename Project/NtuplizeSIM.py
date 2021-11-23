@@ -18,36 +18,23 @@ ifile = options.ifile
 datatag = options.dataset
 outputtag = options.outputtag
 IsRun4 = True
-TestNEvent = 100
-IsPrivate = True
-IsLocal = False
-IsFullRun = True
-if ifile < 0:
-  IsLocal = True
-if ifile == -1:
-  IsFullRun = False
-if IsPrivate:
-  IsRun4 = True
-  IsLocal = True
-  if ifile < 0:
-    ifile = 0
+TestNEvent = -1
+IsLocal = True
+if IsLocal: TestNEvent = -1 #precaution for batch job only run incompletely
+if ifile < 0: ifile = 0 #precaution for testing local private sample
 
 ChangeAlgo = False
 B_matchWithHS = True
 B_assignGEMCSCBending = False
 B_migitageSlopeByCosi = True
-# ifile: >=0 number of file to process. -1: process 100 event local file. -2: process all local file.
-# print("process number: ", ifile)
 
 inputFile = ""
 outputname = ""
 if IsLocal:
-  if IsPrivate:
-    inputFile = 'file:Privatea/0/step2_' + str(ifile) + '.root'
-    outputname = 'out/Privatea_Run4_' + str(ifile) + '.root'
-  else:
-    inputFile = 'file:' + 'step1' + ('Run4' if IsRun4 else 'Run3') + '.root'
-    outputname = 'out/' + 'out_'  + ('Run4' if IsRun4 else 'Run3') + '.root'
+  inputFile = 'file:Private/0/step2_' + str(ifile) + '.root'
+  outputname = 'out/Private_Run4_' + str(ifile) + '.root'
+  # inputFile = 'file:' + 'step1' + ('Run4' if IsRun4 else 'Run3') + '.root'
+  # outputname = 'out/' + 'out_'  + ('Run4' if IsRun4 else 'Run3') + '.root'
 
 else:
   with open("/afs/cern.ch/user/s/siluo/Work/Muon/filenames/"+datatag+".txt") as filenames:
@@ -56,12 +43,10 @@ else:
         inputFile = line
         inputFile = inputFile.strip('\n')
         break
-  outputname = '/eos/user/s/siluo/Muon/'+outputtag+'/InProgress/out_'+str(ifile)+'.root'
+  outputname = '/eos/user/s/siluo/'+outputtag+'/InProgress/out_'+str(ifile)+'.root'
 
-if ifile >= 0 and not IsLocal: print("Processing {}th file of dataset {}.".format(ifile,datatag))
-if IsPrivate: print("Processing {}th file of Private dataset".format(ifile))
-if ifile == -1: print("Testing " + str(TestNEvent) + " events of " + inputFile)
-if ifile == -2: print("Testing all events of " + inputFile)
+if IsLocal: print("Testing {} events of file {}.".format(TestNEvent, inputFile))
+else: print("Processing {}th file of dataset {}.".format(ifile, datatag))
 
 import FWCore.ParameterSet.Config as cms
 
@@ -101,14 +86,13 @@ if not IsLocal:
 
 process.maxEvents = cms.untracked.PSet(
   # input = cms.untracked.int32(-1),
-  input = cms.untracked.int32(TestNEvent if not IsFullRun else -1),
+  input = cms.untracked.int32(TestNEvent),
   output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(inputFile),
-  # fileNames = cms.untracked.vstring(('file:step1' + ('Run4' if IsRun4 else 'Run3') + '.root') if IsLocal else inputFile),
   secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -161,7 +145,6 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
 if IsRun4:
-  # process.GlobalTag = GlobalTag(process.GlobalTag, '113X_mcRun4_realistic_v7', '')
   process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
 else:
   process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
@@ -174,7 +157,6 @@ if ChangeAlgo:
   process.simCscTriggerPrimitiveDigis.tmbPhase2GE11.mitigateSlopeByCosi = cms.bool(B_migitageSlopeByCosi)
   process.simCscTriggerPrimitiveDigis.tmbPhase2GE21.mitigateSlopeByCosi = cms.bool(B_migitageSlopeByCosi)
 
-
 from GEMCode.GEMValidation.cscTriggerCustoms import addCSCTriggerRun3
 process = addCSCTriggerRun3(process)
 
@@ -182,20 +164,20 @@ from GEMCode.GEMValidation.cscTriggerCustoms import runOn120XMC
 if not IsRun4:
   process = runOn120XMC(process)
 
-
-
 # if IsRun4:
 #   process.muonGEMDigis.useDBEMap = False
 #   process.simMuonGEMPadDigis.InputCollection = "simMuonGEMDigis"
 #   # process.muonGEMDigis.readMultiBX = True
-process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
+# process.simCscTriggerPrimitiveDigis.commonParam.runCCLUT = cms.bool(True)
 
 # NtupleMaker
 process.TFileService = cms.Service("TFileService", fileName = cms.string(outputname), closeFileFast = cms.untracked.bool(True))
 
 from GEMCode.GEMValidation.simTrackMatching_cfi import simTrackPSet
+from L1Trigger.CSCTriggerPrimitives.params.gemcscParams import gemcscPSets
 process.NtupleMaker = cms.EDAnalyzer('NtupleMaker',
                                        simTrackPSet,
+                                       gemcscPSets = gemcscPSets,
                                        verbose = cms.untracked.int32(0),
                                        cscStations = cms.vstring("CSC_ALL","CSC_ME11", "CSC_ME1a", "CSC_ME1b", "CSC_ME12", "CSC_ME13",
                                                                  "CSC_ME21", "CSC_ME22", "CSC_ME31", "CSC_ME32", "CSC_ME41", "CSC_ME42"),
@@ -260,8 +242,8 @@ process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 # process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 
-process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
-# process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.endjob_step)
+# process.schedule = cms.Schedule(process.muonGEMDigis_step,process.L1simulation_step,process.ana,process.endjob_step)
+process.schedule = cms.Schedule(process.L1simulation_step,process.ana,process.endjob_step)
 # Schedule definition
 # if IsRun4:
 #   process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.ana,process.endjob_step)

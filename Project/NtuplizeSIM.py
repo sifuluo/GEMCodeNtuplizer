@@ -20,7 +20,7 @@ outputtag = options.outputtag
 IsRun4 = True
 TestNEvent = -1
 IsLocal = True
-if IsLocal: TestNEvent = -1 #precaution for batch job only run incompletely
+if not IsLocal: TestNEvent = -1 #precaution for batch job only run incompletely
 if ifile < 0: ifile = 0 #precaution for testing local private sample
 
 ChangeAlgo = False
@@ -31,7 +31,7 @@ B_migitageSlopeByCosi = True
 inputFile = ""
 outputname = ""
 if IsLocal:
-  inputFile = 'file:Private/0/step2_' + str(ifile) + '.root'
+  inputFile = 'file:nopu/0/step2_' + str(ifile) + '.root'
   outputname = 'out/Private_Run4_' + str(ifile) + '.root'
   # inputFile = 'file:' + 'step1' + ('Run4' if IsRun4 else 'Run3') + '.root'
   # outputname = 'out/' + 'out_'  + ('Run4' if IsRun4 else 'Run3') + '.root'

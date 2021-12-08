@@ -93,7 +93,6 @@
 
 #include "DataFormats/CSCDigi/interface/CSCALCTDigi.h"
 #include "DataFormats/CSCDigi/interface/CSCCLCTDigi.h"
-#include "L1Trigger/CSCTriggerPrimitives/interface/CSCLUTReader.h"
 
 using namespace std;
 using namespace edm;
@@ -151,6 +150,10 @@ private:
   edm::EDGetTokenT<GEMDigiCollection> gemDigiToken_;
   edm::EDGetTokenT<GEMPadDigiCollection> gemPadDigiToken_;
   edm::EDGetTokenT<GEMPadDigiClusterCollection> gemPadDigiClusterToken_;
+
+  edm::ESGetToken<CSCL1TPLookupTableCCLUT, CSCL1TPLookupTableCCLUTRcd> pLookupTableCCLUTToken_;
+  edm::ESGetToken<CSCL1TPLookupTableME11ILT, CSCL1TPLookupTableME11ILTRcd> pLookupTableME11ILTToken_;
+  edm::ESGetToken<CSCL1TPLookupTableME21ILT, CSCL1TPLookupTableME21ILTRcd> pLookupTableME21ILTToken_;
 
   // Ntuple
   TTree* eventTree;
@@ -243,8 +246,11 @@ config(iConfig)
   const auto& P_gemPadDigiCluster = iConfig.getParameter<edm::ParameterSet>("gemPadCluster");
   gemPadDigiClusterToken_ = consumes<GEMPadDigiClusterCollection>(P_gemPadDigiCluster.getParameter<edm::InputTag>("inputTag"));
 
-  const auto& P_gemcscParams = iConfig.getParameter<edm::ParameterSet>("gemcscPSets");
-  GEMConverter = new GEMTool(P_gemcscParams);
+  // const auto& P_gemcscParams = iConfig.getParameter<edm::ParameterSet>("gemcscPSets");
+  // GEMConverter = new GEMTool();
+  // pLookupTableCCLUTToken_ = esConsumes<CSCL1TPLookupTableCCLUT, CSCL1TPLookupTableCCLUTRcd>();
+  pLookupTableME11ILTToken_ = esConsumes<CSCL1TPLookupTableME11ILT, CSCL1TPLookupTableME11ILTRcd>();
+  pLookupTableME21ILTToken_ = esConsumes<CSCL1TPLookupTableME21ILT, CSCL1TPLookupTableME21ILTRcd>();
 
   geomToken_ = esConsumes<GEMGeometry, MuonGeometryRecord>();
 
@@ -343,7 +349,7 @@ void NtupleMaker::beginJob()
   eventTree->Branch("matchmuon_quality",&m_matchmuon_quality);
 
   // GEMConverter->Init(P_gemcscParams);
-
+  GEMConverter = new GEMTool();
 
   tp                     = new TreeDigi();
   cscSimHit              = new TreeDigi();
@@ -465,6 +471,11 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   const edm::SimVertexContainer & sim_vert = *sim_vertices.product();
 
   gemGeometry_ = &iSetup.getData(geomToken_);
+
+  // edm::ESHandle<CSCL1TPLookupTableCCLUT> confCCLUT = setup.getHandle(pLookupTableCCLUTToken_);
+  edm::ESHandle<CSCL1TPLookupTableME11ILT> confME11 = iSetup.getHandle(pLookupTableME11ILTToken_);
+  edm::ESHandle<CSCL1TPLookupTableME21ILT> confME21 = iSetup.getHandle(pLookupTableME21ILTToken_);
+  GEMConverter->Init(confME11.product(), confME21.product());
 
   int tp_index = 0;
   std::vector< TrackingParticle >::const_iterator iterTP;

@@ -2,7 +2,7 @@ import os, sys
 
 InPath = "Private/"
 OutPath = "MuGun/Ntuple/"
-cmssw_ver = "CMSSW_12_0_2_patch2"
+cmssw_ver = "CMSSW_12_2_0_pre3"
 maxfile   = 5000
 #Run4
 # datasets = ["RVSMPt10PU","RVSMPt10noPU","RVSMPt100PU","RVSMPt100noPU","RVSMPt1000PU","RVSMPt1000noPU","RVSMFlatPU","RVSMFlatnoPU"]
@@ -12,7 +12,8 @@ maxfile   = 5000
 # datasets = ["DY","H9","H15","H30","H100"]
 
 #Private
-datasets = ["SMNoPU0","SMNoPU0a","SMNoPU1","SMNoPU1a","SMNoPU2","SMNoPU2a"]
+# datasets = ["SMNoPU0","SMNoPU0a","SMNoPU1","SMNoPU1a","SMNoPU2","SMNoPU2a"]
+datasets = ["DMNoPU0","DMNoPU1","DMNoPU2"]
 
 if len(sys.argv) == 1:
   process = 0
@@ -31,19 +32,19 @@ if process == 0 or process == 1:
     if not os.path.exists(mklogdir):
       os.makedirs(mklogdir)
       print('  Created: ' + ds + ' log directory: ' + mklogdir)
-    else: print( '  Existed: ' + ds + ' log directory' + mklogdir)
+    else: print( '  Existed: ' + ds + ' log directory: ' + mklogdir)
 
     mkeosdir = eosdir+ds
     if not os.path.exists(mkeosdir):
       os.makedirs(mkeosdir)
       print('  Created: ' + ds + ' eos directory: ' + mkeosdir)
-    else: print( '  Existed: ' + ds + ' eos directory' + mkeosdir)
+    else: print( '  Existed: ' + ds + ' eos directory: ' + mkeosdir)
 
     mkeosinprogressdir = os.path.join(mkeosdir,"InProgress")
     if not os.path.exists(mkeosinprogressdir):
       os.makedirs(mkeosinprogressdir)
       print('  Created: ' + ds + ' WIP directory: ' + mkeosinprogressdir)
-    else: print( '  Existed: ' + ds + ' WIP directory' + mkeosinprogressdir)
+    else: print( '  Existed: ' + ds + ' WIP directory: ' + mkeosinprogressdir)
 
     print('Dataset: ' + ds + ' finished creating directories')
   print('Iteration: ' + OutPath + ' finished creating directories')

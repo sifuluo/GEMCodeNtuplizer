@@ -13,7 +13,7 @@ maxfile   = 5000
 
 #Private
 # datasets = ["SMNoPU0","SMNoPU0a","SMNoPU1","SMNoPU1a","SMNoPU2","SMNoPU2a"]
-datasets = ["DMNoPU0","DMNoPU1","DMNoPU2"]
+datasets = ["SMNoPU0","SMNoPU1","SMNoPU2","DMNoPU0","DMNoPU1","DMNoPU2"]
 
 if len(sys.argv) == 1:
   process = 0
@@ -96,7 +96,7 @@ if process == 0 or process == 3:
   lines.append("\n")
   lines.append("# dir=$(pwd)\n")
   lines.append("cd /afs/cern.ch/work/s/siluo/CMSSW/" + cmssw_ver + "/src\n")
-  lines.append("export SCRAM_ARCH=slc7_amd64_gcc700\n")
+  lines.append("export SCRAM_ARCH=slc7_amd64_gcc900\n")
   lines.append("eval `scramv1 runtime -sh`\n")
   lines.append("cd "+curdir+"/\n")
   lines.append("cmsRun NtuplizeSIM.py ifile=$i dataset=$3 outputtag=$5\n")

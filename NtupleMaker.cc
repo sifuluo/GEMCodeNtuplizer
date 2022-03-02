@@ -631,6 +631,12 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         for (auto digi_ : cscStubs->lctsInChamber(detid_) ){
           if (DebugMode) cout << "" << endl;
           auto gp = cscStubs->getGlobalPosition(detid_int,digi_);
+          // bool brokenlct = false;
+          // if ((detid_.station() == 1 && detid.ring() == 4 && digi_.getStrip() < 128) || (detid_.station() == 1 && detid.ring() == 1 && digi_.getStrip() >127)) brokenlct = true;
+          // if (brokenlct) {
+          //   CSCDetId det2(detid_.zendcap(), detid_.station(), 5 - detid_.ring(), detid_.chamber(), detid_.layer());
+          //   auto gp2 = cscStubs->getGlobalPosition(det2.rawId(), digi_);
+          // }
           matchCscStubsLCT->FillGP(gp);
           matchCscStubsLCT->FillLCT(digi_,detid_,tp_index);
           if (Print_matchCscStubs) cout << "detid_int = " <<detid_int<<", detid = " << int(detid_) << ", rawId = " << detid_.rawId() << endl;
@@ -671,11 +677,15 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
               if (id_.region() != detid_.zendcap() || id_.ring() != 1 || id_.station() != detid_.station() || id_.chamber() != detid_.chamber()) continue;
               for (const auto& p : match->gemDigis()->padsInDetId(id)) {
                 if (id_.layer() == 1 && p == digi_.getGEM1() && matchl1 == false) {
+                  auto gp = match->gemDigis()->getGlobalPointPad(id_, p);
+                  matchCscGEM1->FillGP(gp);
                   matchCscGEM1->FillGEMPad(p,id_,digicount);
                   matchl1 = true;
                   PadGemDetId = id_;
                 }
                 if (id_.layer() == 2 && p == digi_.getGEM2() && matchl2 == false) {
+                  auto gp = match->gemDigis()->getGlobalPointPad(id_, p);
+                  matchCscGEM1->FillGP(gp);
                   matchCscGEM2->FillGEMPad(p,id_,digicount);
                   matchl2 = true;
                   PadGemDetId = id_;
@@ -825,12 +835,15 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   int digicount = 0;
   for (auto it = lcts.begin(); it != lcts.end(); ++it) {
     const auto& digivec = (*it).second;
-    const CSCDetId& detid = (*it).first;
+    const CSCDetId& detid_ = (*it).first;
     int digi_index = 0;
     bool doprinta = Print_allCscStubs && Print_ALCT;
     bool doprintc = Print_allCscStubs && Print_CLCT;
     for (auto itdigi = digivec.first; itdigi != digivec.second; ++itdigi) {
       if (DebugMode) cout << " Started "<< digi_index << "th Digi for "<< allCscStubs_index << "th allCscStubsLCTs" <<endl;
+      int ring = detid_.ring();
+      // if (detid_.station() == 1 && detid_.ring() == 1 && itdigi->getStrip() >= 128) ring = 4;
+      CSCDetId detid(detid_.endcap(), detid_.station(), ring, detid_.chamber(), detid_.layer());
       auto gp = match->cscStubs()->getGlobalPosition(detid.rawId(), *itdigi);
       allCscStubsLCT->FillGP(gp);
       allCscStubsLCT->FillLCT(*itdigi,detid);
@@ -873,11 +886,15 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           if (id_.region() != detid.zendcap() || id_.ring() != 1 || id_.station() != detid.station() || id_.chamber() != detid.chamber()) continue;
           for (const auto& p : match->gemDigis()->padsInDetId(id)) {
             if (id_.layer() == 1 && p == (*itdigi).getGEM1() && matchl1 == false) {
+              auto gp = match->gemDigis()->getGlobalPointPad(id_, p);
+              allCscGEM1->FillGP(gp);
               allCscGEM1->FillGEMPad(p,id_,digicount);
               matchl1 = true;
               PadGemDetId = id_;
             }
             if (id_.layer() == 2 && p == (*itdigi).getGEM2() && matchl2 == false) {
+              auto gp = match->gemDigis()->getGlobalPointPad(id_, p);
+              allCscGEM2->FillGP(gp);
               allCscGEM2->FillGEMPad(p,id_,digicount);
               matchl2 = true;
               PadGemDetId = id_;

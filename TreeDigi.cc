@@ -457,11 +457,6 @@ public:
     roll->push_back(id.roll());
   }
 
-  void FillCSCDetId(CSCDetId id) {FillDet(id);}
-  void FillCSCDetId(int rawid) {FillDet(CSCDetId(rawid));}
-  void FillGEMDetId(GEMDetId id) {FillDet(id);}
-  void FillGEMDetId(int rawid) {FillDet(GEMDetId(rawid));}
-
   void FillLCT(CSCCorrelatedLCTDigi lct, CSCDetId id, int tp_index = -1) {
     FillDet(id);
     bend->push_back(lct.getBend());
@@ -471,7 +466,8 @@ public:
     quality->push_back(lct.getQuality());
     keywire->push_back(lct.getKeyWG());
     strip->push_back(lct.getStrip());
-    strip8->push_back(lct.getFractionalStrip(8));
+    // strip8->push_back(lct.getFractionalStrip(8));
+    strip8->push_back(lct.getStrip(8));
     valid->push_back(lct.isValid());
     type->push_back(lct.getType());
     if (tp_index != -1) matchIndex->push_back(tp_index);
@@ -536,7 +532,8 @@ public:
   void FillCLCT(CSCCLCTDigi clct, CSCDetId id, int tp_index = -1) {
     FillDet(id);
     strip->push_back(clct.getStrip());
-    strip8->push_back(clct.getFractionalStrip(8));
+    // strip8->push_back(clct.getFractionalStrip(8));
+    strip8->push_back(clct.getKeyStrip(8));
     valid->push_back(clct.isValid());
     bend->push_back(clct.getBend());
     pattern->push_back(clct.getRun3Pattern());
@@ -567,6 +564,12 @@ public:
   void FillGEMPad0(GEMDetId id, int csc_index = -1) {
     FillDet(id);
     pad->push_back(255);
+    strip->push_back(-1);
+    strip8->push_back(-1);
+    strip_me1a->push_back(-1);
+    strip8_me1a->push_back(-1);
+    keywire_min->push_back(-1);
+    keywire_max->push_back(-1);
     part->push_back(0);
     if (csc_index != -1) matchIndex->push_back(csc_index);
   }

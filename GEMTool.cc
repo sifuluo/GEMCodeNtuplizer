@@ -69,41 +69,36 @@ public:
     if (print) cout << info << ", Pad = " << pad << " is calling ConvertPad for GEMDetId: " << id.rawId() <<  ", " << (isEven_ ? "Even, " : "Odd, ") << id <<endl;
     if (station == 1) {
       if (isEven_) {
-        hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_even(pad);
-        hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_even(pad);
-        es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_even(pad);
-        es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_even(pad);
+        es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_even(pad);
+        es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_even(pad);
         if (roll >= 0) {
           if (layer == 1) {
-            wg_min = lookupTableME11ILT_->GEM_roll_L1_CSC_min_wg_ME11_even(roll);
-            wg_max = lookupTableME11ILT_->GEM_roll_L1_CSC_max_wg_ME11_even(roll);
+            wg_min = lookupTableME11ILT_->GEM_roll_CSC_min_wg_ME11_even(roll);
+            wg_max = lookupTableME11ILT_->GEM_roll_CSC_max_wg_ME11_even(roll);
           }
           else {
-            wg_min = lookupTableME11ILT_->GEM_roll_L2_CSC_min_wg_ME11_even(roll);
-            wg_max = lookupTableME11ILT_->GEM_roll_L2_CSC_max_wg_ME11_even(roll);
+            wg_min = lookupTableME11ILT_->GEM_roll_CSC_min_wg_ME11_even(roll);
+            wg_max = lookupTableME11ILT_->GEM_roll_CSC_max_wg_ME11_even(roll);
           }
         }
       }
       else {
-        hs = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1b_odd(pad);
-        hs_me1a = lookupTableME11ILT_->GEM_pad_CSC_hs_ME1a_odd(pad);
-        es = lookupTableME11ILT_->GEM_pad_CSC_es_ME1b_odd(pad);
-        es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME1a_odd(pad);
+        es = lookupTableME11ILT_->GEM_pad_CSC_es_ME11b_odd(pad);
+        es_me1a = lookupTableME11ILT_->GEM_pad_CSC_es_ME11a_odd(pad);
         if (roll >= 0) {
           if (layer == 1) {
-            wg_min = lookupTableME11ILT_->GEM_roll_L1_CSC_min_wg_ME11_odd(roll);
-            wg_max = lookupTableME11ILT_->GEM_roll_L1_CSC_max_wg_ME11_odd(roll);
+            wg_min = lookupTableME11ILT_->GEM_roll_CSC_min_wg_ME11_odd(roll);
+            wg_max = lookupTableME11ILT_->GEM_roll_CSC_max_wg_ME11_odd(roll);
           }
           else {
-            wg_min = lookupTableME11ILT_->GEM_roll_L2_CSC_min_wg_ME11_odd(roll);
-            wg_max = lookupTableME11ILT_->GEM_roll_L2_CSC_max_wg_ME11_odd(roll);
+            wg_min = lookupTableME11ILT_->GEM_roll_CSC_min_wg_ME11_odd(roll);
+            wg_max = lookupTableME11ILT_->GEM_roll_CSC_max_wg_ME11_odd(roll);
           }
         }
       }
     }
     if (station == 2) {
       if (isEven_) {
-        hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_even(pad);
         es = lookupTableME21ILT_->GEM_pad_CSC_es_ME21_even(pad);
         if (roll >=0) {
           if (layer == 1) {
@@ -117,7 +112,6 @@ public:
         }
       }
       else {
-        hs = lookupTableME21ILT_->GEM_pad_CSC_hs_ME21_odd(pad);
         es = lookupTableME21ILT_->GEM_pad_CSC_es_ME21_odd(pad);
         if ( roll >=0 ) {
           if (layer == 1) {

@@ -65,6 +65,8 @@ public:
       GEM2keywire_max = new std::vector<int>;
       GEM2roll = new std::vector<int>;
       GEM2part = new std::vector<int>;
+      bx = new std::vector<int>;
+
       evttree->Branch(name+"_bend", &bend);
       evttree->Branch(name+"_pattern", &pattern);
       evttree->Branch(name+"_slope", &slope);
@@ -92,6 +94,7 @@ public:
       evttree->Branch(name+"_GEM2keywire_max", &GEM2keywire_max);
       evttree->Branch(name+"_GEM2roll", &GEM2roll);
       evttree->Branch(name+"_GEM2part", &GEM2part);
+      evttree->Branch(name+"_bx",&bx);
       if (IsMatched) {
         matchIndex = new std::vector<int>;
         evttree->Branch(name+"_matchIndex", &matchIndex);
@@ -105,10 +108,12 @@ public:
       hit = new std::vector<int>;
       position = new std::vector<int>;
       valid = new std::vector<bool>;
+      bx = new std::vector<int>;
       evttree->Branch(name+"_keywire", &keywire);
       evttree->Branch(name+"_hit", &hit);
       evttree->Branch(name+"_position", &position);
       evttree->Branch(name+"_valid", &valid);
+      evttree->Branch(name+"_bx",&bx);
     }
 
     //CLCT
@@ -122,6 +127,7 @@ public:
       bend = new std::vector<int>;
       pattern = new std::vector<int>;
       slope = new std::vector<int>;
+      bx = new std::vector<int>;
       evttree->Branch(name+"_strip", &strip);
       evttree->Branch(name+"_strip8", &strip8);
       evttree->Branch(name+"_hit", &hit);
@@ -130,6 +136,7 @@ public:
       evttree->Branch(name+"_bend", &bend);
       evttree->Branch(name+"_pattern", &pattern);
       evttree->Branch(name+"_slope", &slope);
+      evttree->Branch(name+"_bx",&bx);
     }
 
     // GEMDigi
@@ -137,7 +144,9 @@ public:
       InitGP(evttree);
       InitDet(evttree);
       strip = new std::vector<int>;
+      bx = new std::vector<int>;
       evttree->Branch(name+"_strip", &strip);
+      evttree->Branch(name+"_bx",&bx);
       if (IsMatched) {
         matchIndex = new std::vector<int>;
         evttree->Branch(name+"_matchIndex", &matchIndex);
@@ -156,6 +165,7 @@ public:
       keywire_min = new std::vector<int>;
       keywire_max = new std::vector<int>;
       part = new std::vector<int>;
+      bx = new std::vector<int>;
       evttree->Branch(name+"_pad", &pad);
       evttree->Branch(name+"_strip", &strip);
       evttree->Branch(name+"_strip8", &strip8);
@@ -164,6 +174,7 @@ public:
       evttree->Branch(name+"_keywire_min", &keywire_min);
       evttree->Branch(name+"_keywire_max", &keywire_max);
       evttree->Branch(name+"_part", &part);
+      evttree->Branch(name+"_bx",&bx);
       if (IsMatched) {
         matchIndex = new std::vector<int>;
         evttree->Branch(name+"_matchIndex", &matchIndex);
@@ -226,6 +237,7 @@ public:
       keywire_max = new std::vector<int>;
       part = new std::vector<int>;
       len = new std::vector<int>;
+      bx = new std::vector<int>;
       evttree->Branch(name+"_pads", &pads);
       evttree->Branch(name+"_pad", &pad);
       evttree->Branch(name+"_strip", &strip);
@@ -236,6 +248,7 @@ public:
       evttree->Branch(name+"_keywire_max", &keywire_max);
       evttree->Branch(name+"_part", &part);
       evttree->Branch(name+"_len",&len);
+      evttree->Branch(name+"_bx",&bx);
       if (IsMatched) {
         matchIndex = new std::vector<int>;
         evttree->Branch(name+"_matchIndex", &matchIndex);
@@ -290,6 +303,7 @@ public:
       GEM2keywire_max->clear();
       GEM2roll->clear();
       GEM2part->clear();
+      bx->clear();
       if (IsMatched) {
         matchIndex->clear();
       }
@@ -300,6 +314,7 @@ public:
       hit->clear();
       position->clear();
       valid->clear();
+      bx->clear();
     }
     else if (data_type == 2) { //CLCT
       ResetDet();
@@ -311,11 +326,13 @@ public:
       bend->clear();
       pattern->clear();
       slope->clear();
+      bx->clear();
     }
     else if (data_type == 3) { //GEMDigi
       ResetGP();
       ResetDet();
       strip->clear();
+      bx->clear();
       if (IsMatched) {
         matchIndex->clear();
       }
@@ -331,6 +348,7 @@ public:
       keywire_min->clear();
       keywire_max->clear();
       part->clear();
+      bx->clear();
       if (IsMatched) {
         matchIndex->clear();
       }
@@ -369,6 +387,7 @@ public:
       keywire_max->clear();
       part->clear();
       len->clear();
+      bx->clear();
       if (IsMatched) {
         matchIndex->clear();
       }
@@ -470,6 +489,7 @@ public:
     strip8->push_back(lct.getStrip(8));
     valid->push_back(lct.isValid());
     type->push_back(lct.getType());
+    bx->push_back(lct.getBX());
     if (tp_index != -1) matchIndex->push_back(tp_index);
   }
 
@@ -526,6 +546,7 @@ public:
     FillDet(id);
     keywire->push_back(alct.getKeyWG());
     valid->push_back(alct.isValid());
+    bx->push_back(alct.getBX());
     if (tp_index != -1) matchIndex->push_back(tp_index);
   }
 
@@ -538,12 +559,14 @@ public:
     bend->push_back(clct.getBend());
     pattern->push_back(clct.getRun3Pattern());
     slope->push_back(clct.getSlope());
+    bx->push_back(clct.getBX());
     if (tp_index != -1) matchIndex->push_back(tp_index);
   }
 
   void FillGEM(GEMDigi gemdigi, GEMDetId id, int tp_index = -1) {
     FillDet(id);
     strip->push_back(gemdigi.strip());
+    bx->push_back(gemdigi.bx());
     if (tp_index != -1) matchIndex->push_back(tp_index);
   }
 
@@ -558,6 +581,7 @@ public:
     keywire_min->push_back(gem[4]);
     keywire_max->push_back(gem[5]);
     part->push_back(gempad.nPartitions());
+    bx->push_back(gempad.bx());
     if (csc_index != -1) matchIndex->push_back(csc_index);
   }
 
@@ -571,6 +595,7 @@ public:
     keywire_min->push_back(-1);
     keywire_max->push_back(-1);
     part->push_back(0);
+    bx->push_back(255);
     if (csc_index != -1) matchIndex->push_back(csc_index);
   }
 
@@ -598,6 +623,7 @@ public:
     keywire_min->push_back(gem[4]);
     keywire_max->push_back(gem[5]);
     part->push_back(cluster.nPartitions());
+    bx->push_back(cluster.bx());
     if (tp_index != -1) matchIndex->push_back(tp_index);
   }
 
@@ -606,6 +632,7 @@ public:
   }
 
   std::vector<int>*   matchIndex;
+  std::vector<int>*   bx;
 
   //Matrix extraction
   std::vector<int>*   hit;

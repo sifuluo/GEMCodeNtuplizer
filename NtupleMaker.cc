@@ -72,23 +72,23 @@
 #include "SimTracker/TrackTriggerAssociation/interface/TTClusterAssociationMap.h"
 #include "SimTracker/TrackTriggerAssociation/interface/TTStubAssociationMap.h"
 #include "SimTracker/TrackTriggerAssociation/interface/TTTrackAssociationMap.h"
-#include "Geometry/Records/interface/StackedTrackerGeometryRecord.h"
+// #include "Geometry/Records/interface/StackedTrackerGeometryRecord.h"
 
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
-#include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
+// #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
-#include "Geometry/TrackerGeometryBuilder/interface/RectangularPixelTopology.h"
+// #include "Geometry/TrackerGeometryBuilder/interface/RectangularPixelTopology.h"
 #include "Geometry/CommonDetUnit/interface/GeomDetType.h"
 #include "Geometry/CommonDetUnit/interface/GeomDet.h"
 
 #include "Geometry/CommonTopologies/interface/PixelGeomDetUnit.h"
 #include "Geometry/CommonTopologies/interface/PixelGeomDetType.h"
-#include "Geometry/TrackerGeometryBuilder/interface/PixelTopologyBuilder.h"
-#include "Geometry/Records/interface/StackedTrackerGeometryRecord.h"
+// #include "Geometry/TrackerGeometryBuilder/interface/PixelTopologyBuilder.h"
+// #include "Geometry/Records/interface/StackedTrackerGeometryRecord.h"
 #include "Geometry/CommonDetUnit/interface/TrackingGeometry.h"
 
 #include "DataFormats/CSCDigi/interface/CSCALCTDigi.h"
@@ -195,7 +195,7 @@ private:
 
   std::unique_ptr<MatcherManager> match;
 
-  const TrackingGeometry* geometry_;
+  // const TrackingGeometry* geometry_;
 
   edm::ESGetToken<GEMGeometry, MuonGeometryRecord> geomToken_;
   const GEMGeometry* gemGeometry_;
@@ -456,14 +456,14 @@ void NtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle< std::vector< TrackingParticle > > TrackingParticleHandle;
   iEvent.getByToken(TrackingParticleToken_, TrackingParticleHandle);
 
-  edm::ESHandle<TrackerGeometry> geometryHandle;
-  iSetup.get<TrackerDigiGeometryRecord>().get(geometryHandle);
-
-  edm::ESHandle<TrackerTopology> tTopoHandle;
-  iSetup.get<TrackerTopologyRcd>().get(tTopoHandle);
-
-  edm::ESHandle<TrackerGeometry> tGeomHandle;
-  iSetup.get<TrackerDigiGeometryRecord>().get(tGeomHandle);
+  // edm::ESHandle<TrackerGeometry> geometryHandle;
+  // iSetup.get<TrackerDigiGeometryRecord>().get(geometryHandle);
+  //
+  // edm::ESHandle<TrackerTopology> tTopoHandle;
+  // iSetup.get<TrackerTopologyRcd>().get(tTopoHandle);
+  //
+  // edm::ESHandle<TrackerGeometry> tGeomHandle;
+  // iSetup.get<TrackerDigiGeometryRecord>().get(tGeomHandle);
   match->init(iEvent,iSetup);
 
   edm::Handle<edm::SimVertexContainer> sim_vertices;
